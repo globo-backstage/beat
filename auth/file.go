@@ -1,9 +1,9 @@
 package auth
 
 import (
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
-	"gopkg.in/yaml.v2"
 )
 
 type FileAuthentication struct {
@@ -17,14 +17,14 @@ type FileUser struct {
 func NewFileAuthentication(tokensPath string) (Authable, error) {
 	data, err := ioutil.ReadFile(tokensPath)
 
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 
 	authentication := &FileAuthentication{}
 	err = yaml.Unmarshal(data, authentication)
 
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 
@@ -37,6 +37,6 @@ func (authenticaton *FileAuthentication) GetUser(header *http.Header) User {
 	return authenticaton.Tokens[token]
 }
 
-func (user FileUser) Email() string  {
+func (user FileUser) Email() string {
 	return user.TokenEmail
 }

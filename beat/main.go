@@ -8,8 +8,7 @@ import (
 	"github.com/backstage/beat/server"
 )
 
-
-func main()  {
+func main() {
 	var configFile string
 	flag.StringVar(&configFile, "c", "./examples/config.yml", "Config file")
 	flag.Parse()
@@ -19,7 +18,7 @@ func main()  {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	s := server.New(authentication)
 	s.Run()
 }

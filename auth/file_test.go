@@ -1,13 +1,13 @@
 package auth
 
-
 import (
-	"testing"
 	"gopkg.in/check.v1"
 	"net/http"
+	"testing"
 )
 
 var _ = check.Suite(&S{})
+
 type S struct{}
 
 func Test(t *testing.T) {
