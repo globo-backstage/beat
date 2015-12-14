@@ -1,9 +1,13 @@
 package auth;
 
+import (
+	"net/http"
+)
+
 type User interface {
 	Email() string
 }
 
 type Authable interface {
-	GetUser () User
+	GetUser(*http.Header) User
 }
