@@ -37,3 +37,26 @@ func (s *S) TestNewItemSchemaFromReader(c *check.C) {
 	c.Assert(itemSchema.Type, check.Equals, "object")
 	c.Assert(itemSchema.Properties["name"]["type"], check.Equals, "string")
 }
+
+func (s *S) TestNewItemSchemaWhenOmmitAditionalProperties(c *check.C) {
+	schema := `{
+		"collectionName": "example-my-schema",
+		"$schema": "http://json-schema.org/draft-03/hyper-schema#"
+	}`
+	reader := strings.NewReader(schema)
+	itemSchema, err := NewItemSchemaFromReader(reader)
+
+	c.Assert(err, check.IsNil)
+	c.Assert(itemSchema.AditionalProperties, check.IsNil)
+}
+
+func (s *S) TestNewItemSchemaWithDefaultValues(c *check.C) {
+	schema := `{
+		"collectionName": "example-my-schema"
+	}`
+	reader := strings.NewReader(schema)
+	itemSchema, err := NewItemSchemaFromReader(reader)
+
+	c.Assert(err, check.IsNil)
+	c.Assert(itemSchema.Schema, check.Equals, "http://json-schema.org/draft-04/hyper-schema#")
+}

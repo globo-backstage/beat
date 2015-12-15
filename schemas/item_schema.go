@@ -2,8 +2,13 @@ package schemas
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 )
+
+const draft3Schema = "http://json-schema.org/draft-03/hyper-schema#"
+const draft4Schema = "http://json-schema.org/draft-04/hyper-schema#"
+const defaultSchema = draft4Schema
 
 type Properties map[string]map[string]interface{}
 
@@ -12,7 +17,6 @@ type ItemSchema struct {
 	CollectionName       string     `json:"collectionName" bson:"_id"`
 	GlobalCollectionName bool       `json:"globalCollectionName" bson:"globalCollectionName"`
 	AditionalProperties  *bool      `json:"aditionalProperties,omitempty"`
-	VersionId            string     `json:"versionId" bson:"versionId"`
 	Type                 string     `json:"type"`
 	Properties           Properties `json:"properties,omitempty"`
 	// used only in draft4
@@ -25,5 +29,33 @@ func NewItemSchemaFromReader(r io.Reader) (*ItemSchema, error) {
 	if err != nil {
 		return nil, err
 	}
-	return itemSchema, nil
+	itemSchema.fillDefaultValues()
+	return itemSchema, err
+}
+
+func (schema *ItemSchema) fillDefaultValues() {
+	if schema.Schema == "" {
+		schema.Schema = defaultSchema
+	}
+
+	if schema.Type == "" {
+		schema.Type = "object"
+	}
+}
+
+func (schema *ItemSchema) validate() error {
+
+	if schema.Schema != draft3Schema || schema.Schema != draft4Schema {
+		return errors.New("Invalid $schema.")
+	}
+
+	if schema.Type != "object" {
+		return errors.New("Root type must be an object.")
+	}
+
+	if schema.CollectionName == "" {
+		return errors.New("collectionName must not be blank.")
+	}
+
+	return nil
 }
