@@ -5,11 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
 )
 
 const draft3Schema = "http://json-schema.org/draft-03/hyper-schema#"
 const draft4Schema = "http://json-schema.org/draft-04/hyper-schema#"
 const defaultSchema = draft4Schema
+
+var CollectionNameRegex *regexp.Regexp = regexp.MustCompile(`^[a-z0-9-]+$`)
+var CollectionNameSpaceRegex *regexp.Regexp = regexp.MustCompile(`^(\w+)-(.*)$`)
 
 type Properties map[string]map[string]interface{}
 
@@ -64,6 +68,11 @@ func (schema *ItemSchema) validate() error {
 
 	if schema.CollectionName == "" {
 		return errors.New("collectionName must not be blank.")
+	}
+
+	isInvalidGlobalCollectionName := (!schema.GlobalCollectionName && !CollectionNameSpaceRegex.MatchString(schema.CollectionName))
+	if isInvalidGlobalCollectionName || !CollectionNameRegex.MatchString(schema.CollectionName) {
+		return errors.New("collectionName is invalid, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users")
 	}
 
 	return nil

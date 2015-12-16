@@ -66,9 +66,52 @@ func (s *S) TestNewItemSchemaWithInvalidSchema(c *check.C) {
 		"$schema": "http://globo.com/invalid-schema"
 	}`
 
-	reader := strings.NewReader(schema)
-	_, err := NewItemSchemaFromReader(reader)
+	_, err := NewItemSchemaFromReader(strings.NewReader(schema))
 
 	c.Assert(err, check.Not(check.IsNil))
 	c.Assert(err.Error(), check.Equals, `$schema must be "http://json-schema.org/draft-03/hyper-schema#" or "http://json-schema.org/draft-04/hyper-schema#"`)
+
+	schema = `{
+		"collectionName": "backstage-users",
+		"type": "array"
+	}`
+	_, err = NewItemSchemaFromReader(strings.NewReader(schema))
+
+	c.Assert(err, check.Not(check.IsNil))
+	c.Assert(err.Error(), check.Equals, "Root type must be an object.")
+
+	schema = `{}`
+	_, err = NewItemSchemaFromReader(strings.NewReader(schema))
+
+	c.Assert(err, check.Not(check.IsNil))
+	c.Assert(err.Error(), check.Equals, "collectionName must not be blank.")
+
+	schema = `{
+                "collectionName": "123$!"
+        }`
+	_, err = NewItemSchemaFromReader(strings.NewReader(schema))
+
+	c.Assert(err, check.Not(check.IsNil))
+	c.Assert(err.Error(), check.Equals, "collectionName is invalid, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users")
+}
+
+func (s *S) TestNewItemSchemaWithoutNameSpace(c *check.C) {
+	schema := `{
+                "collectionName": "users"
+        }`
+	_, err := NewItemSchemaFromReader(strings.NewReader(schema))
+
+	c.Assert(err, check.Not(check.IsNil))
+	c.Assert(err.Error(), check.Equals, "collectionName is invalid, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users")
+}
+
+func (s *S) TestNewItemSchemaWithGlobalCollectionName(c *check.C) {
+	schema := `{
+                "collectionName": "users",
+                "globalCollectionName": true
+        }`
+	itemSchema, err := NewItemSchemaFromReader(strings.NewReader(schema))
+
+	c.Assert(err, check.IsNil)
+	c.Assert(itemSchema.GlobalCollectionName, check.Equals, true)
 }
