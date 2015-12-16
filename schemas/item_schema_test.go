@@ -79,12 +79,14 @@ func (s *S) TestNewItemSchemaWithInvalidSchema(c *check.C) {
 
 	c.Assert(err, check.Not(check.IsNil))
 	c.Assert(err.Error(), check.Equals, "Root type must be an object.")
+	c.Assert(err.StatusCode(), check.Equals, 422)
 
 	schema = `{}`
 	_, err = NewItemSchemaFromReader(strings.NewReader(schema))
 
 	c.Assert(err, check.Not(check.IsNil))
 	c.Assert(err.Error(), check.Equals, "collectionName must not be blank.")
+	c.Assert(err.StatusCode(), check.Equals, 422)
 
 	schema = `{
                 "collectionName": "123$!"
@@ -93,6 +95,7 @@ func (s *S) TestNewItemSchemaWithInvalidSchema(c *check.C) {
 
 	c.Assert(err, check.Not(check.IsNil))
 	c.Assert(err.Error(), check.Equals, "collectionName is invalid, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users")
+	c.Assert(err.StatusCode(), check.Equals, 422)
 }
 
 func (s *S) TestNewItemSchemaWithoutNameSpace(c *check.C) {
@@ -103,6 +106,7 @@ func (s *S) TestNewItemSchemaWithoutNameSpace(c *check.C) {
 
 	c.Assert(err, check.Not(check.IsNil))
 	c.Assert(err.Error(), check.Equals, "collectionName is invalid, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users")
+	c.Assert(err.StatusCode(), check.Equals, 422)
 }
 
 func (s *S) TestNewItemSchemaWithGlobalCollectionName(c *check.C) {

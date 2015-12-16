@@ -2,6 +2,8 @@ package errors
 
 import (
 	"encoding/json"
+	originalErrors "errors"
+	"fmt"
 )
 
 // DetailedError is a interface to inform the user about the error ocorred.
@@ -44,4 +46,14 @@ func (w *WrappedError) MarshalJSON() ([]byte, error) {
 		},
 	}
 	return json.Marshal(&data)
+}
+
+// New returns new DetailedError based on string.
+func New(text string, statusCode int) DetailedError {
+	return Wraps(originalErrors.New(text), statusCode)
+}
+
+// Newf returns new DetailedError based on string formated by fmt.Errorf.
+func Newf(statusCode int, text string, params ...interface{}) DetailedError {
+	return Wraps(fmt.Errorf(text, params...), statusCode)
 }

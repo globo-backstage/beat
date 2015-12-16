@@ -23,6 +23,20 @@ func (s *S) TestWrapsNewError(c *check.C) {
 	c.Assert(err.StatusCode(), check.Equals, 503)
 }
 
+func (s *S) TestNewError(c *check.C) {
+	err := New("test error 123", 503)
+	c.Assert(err, check.Not(check.IsNil))
+	c.Assert(err.Error(), check.Equals, "test error 123")
+	c.Assert(err.StatusCode(), check.Equals, 503)
+}
+
+func (s *S) TestNewfError(c *check.C) {
+	err := Newf(503, "test error %s", "123")
+	c.Assert(err, check.Not(check.IsNil))
+	c.Assert(err.Error(), check.Equals, "test error 123")
+	c.Assert(err.StatusCode(), check.Equals, 503)
+}
+
 func (s *S) TestMarshallJSONWrappedError(c *check.C) {
 	errWrapped := Wraps(originalErrors.New("test error 123"), 503)
 

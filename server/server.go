@@ -1,12 +1,13 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/backstage/beat/auth"
+	"github.com/backstage/beat/schemas"
+	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-
-	"github.com/backstage/beat/auth"
-	"github.com/julienschmidt/httprouter"
 )
 
 type Server struct {
@@ -48,5 +49,11 @@ func (s *Server) createResource(w http.ResponseWriter, r *http.Request, ps httpr
 }
 
 func (s *Server) createItemSchema(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Fprintf(w, "Created Item schema ")
+	itemSchema, err := schemas.NewItemSchemaFromReader(r.Body)
+
+	if err != nil {
+		json.NewEncoder(w).Encode(err)
+	}
+
+	fmt.Println("itemschema", itemSchema)
 }

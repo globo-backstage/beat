@@ -2,8 +2,7 @@ package schemas
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
+	"github.com/backstage/beat/errors"
 	"io"
 	"regexp"
 )
@@ -34,16 +33,14 @@ type ItemSchema struct {
 
 // NewItemSchemaFromReader return a new ItemSchema by an io.Reader.
 // return a error if the buffer not is valid.
-func NewItemSchemaFromReader(r io.Reader) (*ItemSchema, error) {
+func NewItemSchemaFromReader(r io.Reader) (*ItemSchema, errors.DetailedError) {
 	itemSchema := &ItemSchema{}
 	err := json.NewDecoder(r).Decode(itemSchema)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wraps(err, 400)
 	}
 	itemSchema.fillDefaultValues()
-	err = itemSchema.validate()
-
-	return itemSchema, err
+	return itemSchema, itemSchema.validate()
 }
 
 func (schema *ItemSchema) fillDefaultValues() {
@@ -56,23 +53,23 @@ func (schema *ItemSchema) fillDefaultValues() {
 	}
 }
 
-func (schema *ItemSchema) validate() error {
+func (schema *ItemSchema) validate() errors.DetailedError {
 
 	if schema.Schema != draft3Schema && schema.Schema != draft4Schema {
-		return fmt.Errorf(`$schema must be "%s" or "%s"`, draft3Schema, draft4Schema)
+		return errors.Newf(422, `$schema must be "%s" or "%s"`, draft3Schema, draft4Schema)
 	}
 
 	if schema.Type != "object" {
-		return errors.New("Root type must be an object.")
+		return errors.New("Root type must be an object.", 422)
 	}
 
 	if schema.CollectionName == "" {
-		return errors.New("collectionName must not be blank.")
+		return errors.New("collectionName must not be blank.", 422)
 	}
 
 	isInvalidGlobalCollectionName := (!schema.GlobalCollectionName && !CollectionNameSpaceRegex.MatchString(schema.CollectionName))
 	if isInvalidGlobalCollectionName || !CollectionNameRegex.MatchString(schema.CollectionName) {
-		return errors.New("collectionName is invalid, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users")
+		return errors.New("collectionName is invalid, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users", 422)
 	}
 
 	return nil
