@@ -60,3 +60,15 @@ func (s *S) TestNewItemSchemaWithDefaultValues(c *check.C) {
 	c.Assert(err, check.IsNil)
 	c.Assert(itemSchema.Schema, check.Equals, "http://json-schema.org/draft-04/hyper-schema#")
 }
+
+func (s *S) TestNewItemSchemaWithInvalidSchema(c *check.C) {
+	schema := `{
+		"$schema": "http://globo.com/invalid-schema"
+	}`
+
+	reader := strings.NewReader(schema)
+	_, err := NewItemSchemaFromReader(reader)
+
+	c.Assert(err, check.Not(check.IsNil))
+	c.Assert(err.Error(), check.Equals, `$schema must be "http://json-schema.org/draft-03/hyper-schema#" or "http://json-schema.org/draft-04/hyper-schema#"`)
+}

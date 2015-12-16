@@ -3,6 +3,7 @@ package schemas
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 )
 
@@ -12,6 +13,10 @@ const defaultSchema = draft4Schema
 
 type Properties map[string]map[string]interface{}
 
+// ItemSchema is the main struct for each collection, that describe
+// the data contract and data services.
+// This struct is based on json-schema specification,
+// see more in: http://json-schema.org
 type ItemSchema struct {
 	Schema               string     `json:"$schema" bson:"%20schema"`
 	CollectionName       string     `json:"collectionName" bson:"_id"`
@@ -23,6 +28,8 @@ type ItemSchema struct {
 	Required []string `json:"required,omitempty"`
 }
 
+// NewItemSchemaFromReader return a new ItemSchema by an io.Reader.
+// return a error if the buffer not is valid.
 func NewItemSchemaFromReader(r io.Reader) (*ItemSchema, error) {
 	itemSchema := &ItemSchema{}
 	err := json.NewDecoder(r).Decode(itemSchema)
@@ -30,6 +37,8 @@ func NewItemSchemaFromReader(r io.Reader) (*ItemSchema, error) {
 		return nil, err
 	}
 	itemSchema.fillDefaultValues()
+	err = itemSchema.validate()
+
 	return itemSchema, err
 }
 
@@ -45,8 +54,8 @@ func (schema *ItemSchema) fillDefaultValues() {
 
 func (schema *ItemSchema) validate() error {
 
-	if schema.Schema != draft3Schema || schema.Schema != draft4Schema {
-		return errors.New("Invalid $schema.")
+	if schema.Schema != draft3Schema && schema.Schema != draft4Schema {
+		return fmt.Errorf(`$schema must be "%s" or "%s"`, draft3Schema, draft4Schema)
 	}
 
 	if schema.Type != "object" {
