@@ -33,7 +33,7 @@ type ItemSchema struct {
 
 // NewItemSchemaFromReader return a new ItemSchema by an io.Reader.
 // return a error if the buffer not is valid.
-func NewItemSchemaFromReader(r io.Reader) (*ItemSchema, errors.DetailedError) {
+func NewItemSchemaFromReader(r io.Reader) (*ItemSchema, errors.Error) {
 	itemSchema := &ItemSchema{}
 	err := json.NewDecoder(r).Decode(itemSchema)
 	if err != nil {
@@ -53,7 +53,7 @@ func (schema *ItemSchema) fillDefaultValues() {
 	}
 }
 
-func (schema *ItemSchema) validate() errors.DetailedError {
+func (schema *ItemSchema) validate() errors.Error {
 
 	if schema.Schema != draft3Schema && schema.Schema != draft4Schema {
 		return errors.Newf(422, `$schema must be "%s" or "%s"`, draft3Schema, draft4Schema)
