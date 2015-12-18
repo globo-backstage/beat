@@ -50,3 +50,29 @@ func (s *S) TestMarshallJSONWrappedError(c *check.C) {
 	c.Assert(err3, check.IsNil)
 	c.Assert(msg, check.Equals, "test error 123")
 }
+
+func (s *S) TestValidationError(c *check.C) {
+	err := &ValidationError{}
+	c.Assert(err.StatusCode(), check.Equals, 422)
+	c.Assert(err.Error(), check.Equals, "")
+	c.Assert(err.Length(), check.Equals, 0)
+
+	err.Put("name", "is required")
+	c.Assert(err.Error(), check.Equals, "name: is required")
+	c.Assert(err.Length(), check.Equals, 1)
+}
+
+func (s *S) TestValidationErrorMarshallJSON(c *check.C) {
+	err := &ValidationError{}
+	err.Put("name", "is required")
+
+	data, err1 := json.Marshal(err)
+	c.Assert(err1, check.IsNil)
+
+	errJson, err2 := simplejson.NewJson(data)
+	c.Assert(err2, check.IsNil)
+
+	msg, err3 := errJson.Get("errors").GetIndex(0).Get("name").GetIndex(0).String()
+	c.Assert(err3, check.IsNil)
+	c.Assert(msg, check.Equals, "is required")
+}

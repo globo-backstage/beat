@@ -2,6 +2,7 @@ package schemas
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/backstage/beat/errors"
 	"io"
 	"regexp"
@@ -54,22 +55,26 @@ func (schema *ItemSchema) fillDefaultValues() {
 }
 
 func (schema *ItemSchema) validate() errors.Error {
+	validation := &errors.ValidationError{}
 
 	if schema.Schema != draft3Schema && schema.Schema != draft4Schema {
-		return errors.Newf(422, `$schema must be "%s" or "%s"`, draft3Schema, draft4Schema)
+		validation.Put("$schema", fmt.Sprintf(`must be "%s" or "%s"`, draft3Schema, draft4Schema))
 	}
 
 	if schema.Type != "object" {
-		return errors.New("Root type must be an object.", 422)
-	}
-
-	if schema.CollectionName == "" {
-		return errors.New("collectionName must not be blank.", 422)
+		validation.Put("type", "Root type must be an object.")
 	}
 
 	isInvalidGlobalCollectionName := (!schema.GlobalCollectionName && !CollectionNameSpaceRegex.MatchString(schema.CollectionName))
-	if isInvalidGlobalCollectionName || !CollectionNameRegex.MatchString(schema.CollectionName) {
-		return errors.New("collectionName is invalid, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users", 422)
+
+	if schema.CollectionName == "" {
+		validation.Put("collectionName", "must not be blank.")
+	} else if isInvalidGlobalCollectionName || !CollectionNameRegex.MatchString(schema.CollectionName) {
+		validation.Put("collectionName", "invalid format, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users")
+	}
+
+	if validation.Length() > 0 {
+		return validation
 	}
 
 	return nil

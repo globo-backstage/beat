@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	originalErrors "errors"
 	"fmt"
+	"strings"
 )
 
 // Error is a interface to inform the user about the error ocorred.
@@ -56,4 +57,56 @@ func New(text string, statusCode int) Error {
 // Newf returns new Error based on string formated by fmt.Errorf.
 func Newf(statusCode int, text string, params ...interface{}) Error {
 	return Wraps(fmt.Errorf(text, params...), statusCode)
+}
+
+// ValidationError is another implementation of Error interface.
+// used to group field errors in one.
+type ValidationError struct {
+	items []validateItemError
+}
+
+func (v *ValidationError) StatusCode() int {
+	return 422
+}
+
+func (v *ValidationError) Error() string {
+	parts := []string{}
+
+	for _, item := range v.items {
+		parts = append(
+			parts,
+			fmt.Sprintf("%s: %s", item.field, item.message),
+		)
+	}
+
+	return strings.Join(parts, ", ")
+}
+
+func (v *ValidationError) Length() int {
+	return len(v.items)
+}
+
+func (v *ValidationError) Put(field, message string) {
+	item := validateItemError{field: field, message: message}
+	v.items = append(v.items, item)
+}
+
+func (v *ValidationError) MarshalJSON() ([]byte, error) {
+	errorParts := []interface{}{}
+	for _, item := range v.items {
+		errorParts = append(errorParts, map[string]interface{}{
+			item.field: []string{
+				item.message,
+			},
+		})
+	}
+	data := map[string]interface{}{
+		"errors": errorParts,
+	}
+	return json.Marshal(&data)
+}
+
+type validateItemError struct {
+	field   string
+	message string
 }

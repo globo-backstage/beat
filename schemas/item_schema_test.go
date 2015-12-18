@@ -63,13 +63,14 @@ func (s *S) TestNewItemSchemaWithDefaultValues(c *check.C) {
 
 func (s *S) TestNewItemSchemaWithInvalidSchema(c *check.C) {
 	schema := `{
-		"$schema": "http://globo.com/invalid-schema"
+		"$schema": "http://globo.com/invalid-schema",
+		"collectionName" : "backstage-valid"
 	}`
 
 	_, err := NewItemSchemaFromReader(strings.NewReader(schema))
 
 	c.Assert(err, check.Not(check.IsNil))
-	c.Assert(err.Error(), check.Equals, `$schema must be "http://json-schema.org/draft-03/hyper-schema#" or "http://json-schema.org/draft-04/hyper-schema#"`)
+	c.Assert(err.Error(), check.Equals, `$schema: must be "http://json-schema.org/draft-03/hyper-schema#" or "http://json-schema.org/draft-04/hyper-schema#"`)
 
 	schema = `{
 		"collectionName": "backstage-users",
@@ -78,14 +79,14 @@ func (s *S) TestNewItemSchemaWithInvalidSchema(c *check.C) {
 	_, err = NewItemSchemaFromReader(strings.NewReader(schema))
 
 	c.Assert(err, check.Not(check.IsNil))
-	c.Assert(err.Error(), check.Equals, "Root type must be an object.")
+	c.Assert(err.Error(), check.Equals, "type: Root type must be an object.")
 	c.Assert(err.StatusCode(), check.Equals, 422)
 
 	schema = `{}`
 	_, err = NewItemSchemaFromReader(strings.NewReader(schema))
 
 	c.Assert(err, check.Not(check.IsNil))
-	c.Assert(err.Error(), check.Equals, "collectionName must not be blank.")
+	c.Assert(err.Error(), check.Equals, "collectionName: must not be blank.")
 	c.Assert(err.StatusCode(), check.Equals, 422)
 
 	schema = `{
@@ -94,7 +95,7 @@ func (s *S) TestNewItemSchemaWithInvalidSchema(c *check.C) {
 	_, err = NewItemSchemaFromReader(strings.NewReader(schema))
 
 	c.Assert(err, check.Not(check.IsNil))
-	c.Assert(err.Error(), check.Equals, "collectionName is invalid, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users")
+	c.Assert(err.Error(), check.Equals, "collectionName: invalid format, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users")
 	c.Assert(err.StatusCode(), check.Equals, 422)
 }
 
@@ -105,7 +106,7 @@ func (s *S) TestNewItemSchemaWithoutNameSpace(c *check.C) {
 	_, err := NewItemSchemaFromReader(strings.NewReader(schema))
 
 	c.Assert(err, check.Not(check.IsNil))
-	c.Assert(err.Error(), check.Equals, "collectionName is invalid, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users")
+	c.Assert(err.Error(), check.Equals, "collectionName: invalid format, use {namespace}-{name}, with characters a-z and 0-9, ex: backstage-users")
 	c.Assert(err.StatusCode(), check.Equals, 422)
 }
 
