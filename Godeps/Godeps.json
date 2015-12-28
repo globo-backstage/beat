@@ -16,6 +16,11 @@
 			"Rev": "f30ab90cccbd5171771d26b6557d3c2f49e047a6"
 		},
 		{
+			"ImportPath": "github.com/kelseyhightower/envconfig",
+			"Comment": "v1.0.0-26-g12c18e8",
+			"Rev": "12c18e8343f6eb5fc3a9d5c8dc353e42e6bb40b9"
+		},
+		{
 			"ImportPath": "gopkg.in/check.v1",
 			"Rev": "11d3bc7aa68e238947792f30573146a3231fc0f1"
 		},
