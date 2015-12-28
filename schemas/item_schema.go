@@ -8,6 +8,7 @@ import (
 	"regexp"
 )
 
+const ItemSchemaCollectionName = "item-schemas"
 const draft3Schema = "http://json-schema.org/draft-03/hyper-schema#"
 const draft4Schema = "http://json-schema.org/draft-04/hyper-schema#"
 const defaultSchema = draft4Schema

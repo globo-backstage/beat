@@ -40,7 +40,7 @@ func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request, _ httproute
 
 func (s *Server) createResource(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	collectionName := ps.ByName("collectionName")
-	if collectionName == "item-schemas" {
+	if collectionName == schemas.ItemSchemaCollectionName {
 		s.createItemSchema(w, r, ps)
 		return
 	}
