@@ -5,5 +5,5 @@ import (
 )
 
 type Database interface {
-	CreateItemSchema(schemas.ItemSchema) error
+	CreateItemSchema(*schemas.ItemSchema) error
 }

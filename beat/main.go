@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/backstage/beat/auth"
+	"github.com/backstage/beat/db/mongo"
 	"github.com/backstage/beat/server"
 )
 
@@ -19,6 +20,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	s := server.New(authentication)
+	db, err := mongo.New()
+
+	if err != nil {
+		log.Fatalf("[mongodb] %s", err)
+	}
+
+	s := server.New(authentication, db)
 	s.Run()
 }

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/backstage/beat/auth"
+	"github.com/backstage/beat/db"
+	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
 	"github.com/julienschmidt/httprouter"
 	"log"
@@ -12,12 +14,14 @@ import (
 
 type Server struct {
 	Authentication auth.Authable
+	DB             db.Database
 	router         *httprouter.Router
 }
 
-func New(authentication auth.Authable) *Server {
+func New(authentication auth.Authable, db db.Database) *Server {
 	server := &Server{
 		Authentication: authentication,
+		DB:             db,
 	}
 	server.initRoutes()
 	return server
@@ -52,8 +56,23 @@ func (s *Server) createItemSchema(w http.ResponseWriter, r *http.Request, ps htt
 	itemSchema, err := schemas.NewItemSchemaFromReader(r.Body)
 
 	if err != nil {
-		json.NewEncoder(w).Encode(err)
+		s.writeError(w, err)
+		return
 	}
 
-	fmt.Println("itemschema", itemSchema)
+	dbErr := s.DB.CreateItemSchema(itemSchema)
+
+	if dbErr != nil {
+		s.writeError(w, errors.Wraps(dbErr, 500))
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(itemSchema)
+
+}
+
+func (s *Server) writeError(w http.ResponseWriter, err errors.Error) {
+	w.WriteHeader(err.StatusCode())
+	json.NewEncoder(w).Encode(err)
 }

@@ -26,7 +26,7 @@ type ItemSchema struct {
 	Schema               string     `json:"$schema" bson:"%20schema"`
 	CollectionName       string     `json:"collectionName" bson:"_id"`
 	GlobalCollectionName bool       `json:"globalCollectionName" bson:"globalCollectionName"`
-	AditionalProperties  *bool      `json:"aditionalProperties,omitempty"`
+	AditionalProperties  *bool      `json:"aditionalProperties,omitempty" bson:"aditionalProperties"`
 	Type                 string     `json:"type"`
 	Properties           Properties `json:"properties,omitempty"`
 	// used only in draft4
