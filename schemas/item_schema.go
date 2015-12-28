@@ -55,6 +55,10 @@ func (schema *ItemSchema) fillDefaultValues() {
 	}
 }
 
+func (schema *ItemSchema) String() string {
+	return fmt.Sprintf(`<ItemSchema "%s">`, schema.CollectionName)
+}
+
 func (schema *ItemSchema) validate() errors.Error {
 	validation := &errors.ValidationError{}
 
