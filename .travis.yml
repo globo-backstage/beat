@@ -25,3 +25,5 @@ notifications:
       - backstage1@corp.globo.com
       - backstage2@corp.globo.com
 
+services:
+  - mongodb
