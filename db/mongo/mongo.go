@@ -69,7 +69,7 @@ func (m *MongoDB) FindItemSchema(filter *db.Filter) (*db.ItemSchemasReply, error
 
 	reply := &db.ItemSchemasReply{}
 	reply.Items = []schemas.ItemSchema{}
-	err := query.Iter().All(&reply.Items)
+	err := query.Skip(filter.Skip()).Limit(filter.PerPage).Iter().All(&reply.Items)
 
 	if err != nil {
 		return nil, errors.Wraps(err, 500)

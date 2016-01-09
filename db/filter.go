@@ -9,6 +9,7 @@ import (
 
 type Filter struct {
 	Where   *simplejson.Json
+	Page    int
 	PerPage int
 }
 
@@ -30,7 +31,12 @@ func NewFilterFromQueryString(q string) (*Filter, error) {
 }
 
 func (filter *Filter) loadInitialValues() {
+	filter.Page = 1
 	filter.PerPage = 10
+}
+
+func (filter *Filter) Skip() int {
+	return (filter.Page - 1) * filter.PerPage
 }
 
 func (filter *Filter) putUrlValue(key, value string) {
@@ -46,10 +52,17 @@ func (filter *Filter) putUrlValue(key, value string) {
 	}
 
 	if path[0] == "filter" && len(path) > 1 {
-		if path[1] == "perPage" {
+		switch path[1] {
+		case "perPage":
 			filter.setPerPageFromString(value)
-		} else if len(path) > 2 && path[1] == "where" {
-			filter.putWhere(path[2:], value)
+			return
+		case "page":
+			filter.setPageFromString(value)
+			return
+		case "where":
+			if len(path) > 2 {
+				filter.putWhere(path[2:], value)
+			}
 		}
 	}
 }
@@ -60,6 +73,15 @@ func (filter *Filter) setPerPageFromString(perPage string) {
 			s = 1000
 		}
 		filter.PerPage = s
+	}
+}
+
+func (filter *Filter) setPageFromString(page string) {
+	if s, err := strconv.Atoi(page); err == nil {
+		if s < 1 {
+			s = 1
+		}
+		filter.Page = s
 	}
 }
 
