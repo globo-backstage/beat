@@ -62,6 +62,18 @@ func (m *MongoDB) CreateItemSchema(itemSchema *schemas.ItemSchema) errors.Error 
 	}
 }
 
-func (m *MongoDB) FindItemSchema(filter *db.Filter) (interface{}, errors.Error) {
-	return nil, nil
+func (m *MongoDB) FindItemSchema(filter *db.Filter) (*db.ItemSchemasReply, errors.Error) {
+	session := m.session.Clone()
+	defer session.Close()
+	query := session.DB("").C(schemas.ItemSchemaCollectionName).Find(nil)
+
+	reply := &db.ItemSchemasReply{}
+	reply.Items = []schemas.ItemSchema{}
+	err := query.Iter().All(&reply.Items)
+
+	if err != nil {
+		return nil, errors.Wraps(err, 500)
+	}
+
+	return reply, nil
 }

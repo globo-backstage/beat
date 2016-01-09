@@ -7,5 +7,9 @@ import (
 
 type Database interface {
 	CreateItemSchema(*schemas.ItemSchema) errors.Error
-	FindItemSchema(filter *Filter) (interface{}, errors.Error)
+	FindItemSchema(filter *Filter) (*ItemSchemasReply, errors.Error)
+}
+
+type ItemSchemasReply struct {
+	Items []schemas.ItemSchema `json:"items"`
 }
