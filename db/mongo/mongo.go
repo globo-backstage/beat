@@ -4,8 +4,10 @@ import (
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
+	simplejson "github.com/bitly/go-simplejson"
 	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type MongoConfig struct {
@@ -65,7 +67,8 @@ func (m *MongoDB) CreateItemSchema(itemSchema *schemas.ItemSchema) errors.Error 
 func (m *MongoDB) FindItemSchema(filter *db.Filter) (*db.ItemSchemasReply, errors.Error) {
 	session := m.session.Clone()
 	defer session.Close()
-	query := session.DB("").C(schemas.ItemSchemaCollectionName).Find(nil)
+	where := BuildMongoWhere(filter.Where, schemas.ItemSchemaPrimaryKey)
+	query := session.DB("").C(schemas.ItemSchemaCollectionName).Find(where)
 
 	reply := &db.ItemSchemasReply{}
 	reply.Items = []schemas.ItemSchema{}
@@ -76,4 +79,33 @@ func (m *MongoDB) FindItemSchema(filter *db.Filter) (*db.ItemSchemasReply, error
 	}
 
 	return reply, nil
+}
+
+func BuildMongoWhere(where *simplejson.Json, primaryKey string) bson.M {
+	mongoWhere := bson.M{}
+	for key, value := range where.MustMap() {
+		switch key {
+		case "and", "or", "nor":
+			mongoWhere["$"+key] = buildMongoWhereByArray(
+				where.Get(key),
+				primaryKey,
+			)
+			continue
+
+		case primaryKey:
+			mongoWhere["_id"] = value
+			continue
+		}
+		mongoWhere[key] = value
+	}
+	return mongoWhere
+}
+
+func buildMongoWhereByArray(wheres *simplejson.Json, primaryKey string) []bson.M {
+	mongoWheres := []bson.M{}
+	for key, _ := range wheres.MustArray() {
+		mongoWhere := BuildMongoWhere(wheres.GetIndex(key), primaryKey)
+		mongoWheres = append(mongoWheres, mongoWhere)
+	}
+	return mongoWheres
 }
