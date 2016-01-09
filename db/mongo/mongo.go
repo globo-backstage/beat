@@ -1,6 +1,8 @@
 package mongo
 
 import (
+	"github.com/backstage/beat/db"
+	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
 	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/mgo.v2"
@@ -48,8 +50,18 @@ func New() (*MongoDB, error) {
 	return d, nil
 }
 
-func (m *MongoDB) CreateItemSchema(itemSchema *schemas.ItemSchema) error {
+func (m *MongoDB) CreateItemSchema(itemSchema *schemas.ItemSchema) errors.Error {
 	session := m.session.Clone()
 	defer session.Close()
-	return session.DB("").C(schemas.ItemSchemaCollectionName).Insert(itemSchema)
+	err := session.DB("").C(schemas.ItemSchemaCollectionName).Insert(itemSchema)
+
+	if err == nil {
+		return nil
+	} else {
+		return errors.Wraps(err, 500)
+	}
+}
+
+func (m *MongoDB) FindItemSchema(filter *db.Filter) (interface{}, errors.Error) {
+	return nil, nil
 }

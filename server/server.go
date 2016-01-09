@@ -36,6 +36,7 @@ func (s *Server) initRoutes() {
 	s.router.GET("/", s.healthCheck)
 	s.router.GET("/healthcheck", s.healthCheck)
 	s.router.POST("/api/:collectionName", s.createResource)
+	s.router.GET("/api/:collectionName", s.findResource)
 }
 
 func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -50,6 +51,16 @@ func (s *Server) createResource(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	fmt.Fprintf(w, "Created")
+}
+
+func (s *Server) findResource(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	collectionName := ps.ByName("collectionName")
+	if collectionName == schemas.ItemSchemaCollectionName {
+		s.findItemSchema(w, r, ps)
+		return
+	}
+
+	fmt.Fprintf(w, "Find")
 }
 
 func (s *Server) createItemSchema(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -70,6 +81,23 @@ func (s *Server) createItemSchema(w http.ResponseWriter, r *http.Request, ps htt
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(itemSchema)
 
+}
+
+func (s *Server) findItemSchema(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	filter, err := db.NewFilterFromQueryString(r.URL.RawQuery)
+
+	if err != nil {
+		s.writeError(w, errors.Wraps(err, 400))
+		return
+	}
+
+	reply, findErr := s.DB.FindItemSchema(filter)
+	if findErr != nil {
+		s.writeError(w, findErr)
+		return
+	}
+
+	json.NewEncoder(w).Encode(reply)
 }
 
 func (s *Server) writeError(w http.ResponseWriter, err errors.Error) {
