@@ -7,7 +7,9 @@ import (
 
 type Database interface {
 	CreateItemSchema(*schemas.ItemSchema) errors.Error
-	FindItemSchema(filter *Filter) (*ItemSchemasReply, errors.Error)
+	FindItemSchema(*Filter) (*ItemSchemasReply, errors.Error)
+	FindOneItemSchema(*Filter) (*schemas.ItemSchema, errors.Error)
+	FindItemSchemaByCollectionName(string) (*schemas.ItemSchema, errors.Error)
 }
 
 type ItemSchemasReply struct {

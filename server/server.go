@@ -37,6 +37,7 @@ func (s *Server) initRoutes() {
 	s.router.GET("/healthcheck", s.healthCheck)
 	s.router.POST("/api/:collectionName", s.createResource)
 	s.router.GET("/api/:collectionName", s.findResource)
+	s.router.GET("/api/:collectionName/:resourceId", s.findResourceById)
 }
 
 func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -61,6 +62,18 @@ func (s *Server) findResource(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	fmt.Fprintf(w, "Find")
+}
+
+func (s *Server) findResourceById(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	collectionName := ps.ByName("collectionName")
+
+	if collectionName == schemas.ItemSchemaCollectionName {
+		s.findItemSchemaByCollectionName(w, r, ps)
+		return
+
+	}
+
+	fmt.Fprintf(w, "FindById")
 }
 
 func (s *Server) createItemSchema(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -98,6 +111,40 @@ func (s *Server) findItemSchema(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	json.NewEncoder(w).Encode(reply)
+}
+
+func (s *Server) findItemSchemaByCollectionName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	resourceId := ps.ByName("resourceId")
+
+	if resourceId == "findOne" {
+		s.findOneItemSchema(w, r, ps)
+		return
+	}
+
+	itemSchema, err := s.DB.FindItemSchemaByCollectionName(resourceId)
+	if err != nil {
+		s.writeError(w, err)
+		return
+	}
+
+	json.NewEncoder(w).Encode(itemSchema)
+}
+
+func (s *Server) findOneItemSchema(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	filter, err := db.NewFilterFromQueryString(r.URL.RawQuery)
+
+	if err != nil {
+		s.writeError(w, errors.Wraps(err, 400))
+		return
+	}
+
+	itemSchema, findErr := s.DB.FindOneItemSchema(filter)
+	if findErr != nil {
+		s.writeError(w, findErr)
+		return
+	}
+
+	json.NewEncoder(w).Encode(itemSchema)
 }
 
 func (s *Server) writeError(w http.ResponseWriter, err errors.Error) {

@@ -81,6 +81,40 @@ func (m *MongoDB) FindItemSchema(filter *db.Filter) (*db.ItemSchemasReply, error
 	return reply, nil
 }
 
+func (m *MongoDB) FindOneItemSchema(filter *db.Filter) (*schemas.ItemSchema, errors.Error) {
+	session := m.session.Clone()
+	defer session.Close()
+	where := BuildMongoWhere(filter.Where, schemas.ItemSchemaPrimaryKey)
+	query := session.DB("").C(schemas.ItemSchemaCollectionName).Find(where)
+
+	itemSchema := &schemas.ItemSchema{}
+	err := query.One(&itemSchema)
+
+	if err == mgo.ErrNotFound {
+		return nil, errors.New("item-schema not found", 404)
+	} else if err != nil {
+		return nil, errors.Wraps(err, 500)
+	}
+
+	return itemSchema, nil
+}
+
+func (m *MongoDB) FindItemSchemaByCollectionName(collectionName string) (*schemas.ItemSchema, errors.Error) {
+	session := m.session.Clone()
+	defer session.Close()
+
+	itemSchema := &schemas.ItemSchema{}
+	err := session.DB("").C(schemas.ItemSchemaCollectionName).FindId(collectionName).One(&itemSchema)
+
+	if err == mgo.ErrNotFound {
+		return nil, errors.Newf(404, `item-schema "%s" not found`, collectionName)
+	} else if err != nil {
+		return nil, errors.Wraps(err, 500)
+	}
+
+	return itemSchema, nil
+}
+
 func BuildMongoWhere(where *simplejson.Json, primaryKey string) bson.M {
 	mongoWhere := bson.M{}
 	for key, value := range where.MustMap() {
