@@ -10,6 +10,7 @@ type Database interface {
 	FindItemSchema(*Filter) (*ItemSchemasReply, errors.Error)
 	FindOneItemSchema(*Filter) (*schemas.ItemSchema, errors.Error)
 	FindItemSchemaByCollectionName(string) (*schemas.ItemSchema, errors.Error)
+	DeleteItemSchemaByCollectionName(string) errors.Error
 }
 
 type ItemSchemasReply struct {

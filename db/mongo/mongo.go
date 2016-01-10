@@ -115,6 +115,19 @@ func (m *MongoDB) FindItemSchemaByCollectionName(collectionName string) (*schema
 	return itemSchema, nil
 }
 
+func (m *MongoDB) DeleteItemSchemaByCollectionName(collectionName string) errors.Error {
+	session := m.session.Clone()
+	defer session.Close()
+
+	err := session.DB("").C(schemas.ItemSchemaCollectionName).RemoveId(collectionName)
+	if err == mgo.ErrNotFound {
+		return errors.Newf(404, `item-schema "%s" not found`, collectionName)
+	} else if err != nil {
+		return errors.Wraps(err, 500)
+	}
+	return nil
+}
+
 func BuildMongoWhere(where *simplejson.Json, primaryKey string) bson.M {
 	mongoWhere := bson.M{}
 	for key, value := range where.MustMap() {

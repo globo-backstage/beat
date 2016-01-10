@@ -38,6 +38,7 @@ func (s *Server) initRoutes() {
 	s.router.POST("/api/:collectionName", s.createResource)
 	s.router.GET("/api/:collectionName", s.findResource)
 	s.router.GET("/api/:collectionName/:resourceId", s.findResourceById)
+	s.router.DELETE("/api/:collectionName/:resourceId", s.deleteResourceById)
 }
 
 func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -70,10 +71,20 @@ func (s *Server) findResourceById(w http.ResponseWriter, r *http.Request, ps htt
 	if collectionName == schemas.ItemSchemaCollectionName {
 		s.findItemSchemaByCollectionName(w, r, ps)
 		return
-
 	}
 
 	fmt.Fprintf(w, "FindById")
+}
+
+func (s *Server) deleteResourceById(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	collectionName := ps.ByName("collectionName")
+
+	if collectionName == schemas.ItemSchemaCollectionName {
+		s.deleteItemSchemaByCollectionName(w, r, ps)
+		return
+	}
+
+	fmt.Fprintf(w, "deleteById")
 }
 
 func (s *Server) createItemSchema(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -145,6 +156,17 @@ func (s *Server) findOneItemSchema(w http.ResponseWriter, r *http.Request, _ htt
 	}
 
 	json.NewEncoder(w).Encode(itemSchema)
+}
+
+func (s *Server) deleteItemSchemaByCollectionName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	resourceId := ps.ByName("resourceId")
+	err := s.DB.DeleteItemSchemaByCollectionName(resourceId)
+	if err != nil {
+		s.writeError(w, err)
+		return
+	}
+
+	w.WriteHeader(204)
 }
 
 func (s *Server) writeError(w http.ResponseWriter, err errors.Error) {
