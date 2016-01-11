@@ -7,7 +7,7 @@ import (
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
-	"github.com/julienschmidt/httprouter"
+	"github.com/dimfeld/httptreemux"
 	"log"
 	"net/http"
 )
@@ -15,7 +15,7 @@ import (
 type Server struct {
 	Authentication auth.Authable
 	DB             db.Database
-	router         *httprouter.Router
+	router         *httptreemux.TreeMux
 }
 
 func New(authentication auth.Authable, db db.Database) *Server {
@@ -32,62 +32,48 @@ func (s *Server) Run() {
 }
 
 func (s *Server) initRoutes() {
-	s.router = httprouter.New()
+	s.router = httptreemux.New()
 	s.router.GET("/", s.healthCheck)
 	s.router.GET("/healthcheck", s.healthCheck)
+
+	s.router.POST("/api/item-schemas", s.createItemSchema)
+	s.router.GET("/api/item-schemas", s.findItemSchema)
+	s.router.GET("/api/item-schemas/findOne", s.findOneItemSchema)
+	s.router.GET("/api/item-schemas/:collectionName", s.findItemSchemaByCollectionName)
+	s.router.DELETE("/api/item-schemas/:collectionName", s.deleteItemSchemaByCollectionName)
+
 	s.router.POST("/api/:collectionName", s.createResource)
 	s.router.GET("/api/:collectionName", s.findResource)
+	s.router.GET("/api/:collectionName/findOne", s.findOneResource)
 	s.router.GET("/api/:collectionName/:resourceId", s.findResourceById)
 	s.router.DELETE("/api/:collectionName/:resourceId", s.deleteResourceById)
 }
 
-func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	fmt.Fprintf(w, "WORKING")
 }
 
-func (s *Server) createResource(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	collectionName := ps.ByName("collectionName")
-	if collectionName == schemas.ItemSchemaCollectionName {
-		s.createItemSchema(w, r, ps)
-		return
-	}
-
-	fmt.Fprintf(w, "Created")
+func (s *Server) createResource(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	fmt.Fprintf(w, "TODO: Create resource")
 }
 
-func (s *Server) findResource(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	collectionName := ps.ByName("collectionName")
-	if collectionName == schemas.ItemSchemaCollectionName {
-		s.findItemSchema(w, r, ps)
-		return
-	}
-
-	fmt.Fprintf(w, "Find")
+func (s *Server) findResource(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	fmt.Fprintf(w, "TODO: Find resource")
 }
 
-func (s *Server) findResourceById(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	collectionName := ps.ByName("collectionName")
-
-	if collectionName == schemas.ItemSchemaCollectionName {
-		s.findItemSchemaByCollectionName(w, r, ps)
-		return
-	}
-
-	fmt.Fprintf(w, "FindById")
+func (s *Server) findOneResource(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	fmt.Fprintf(w, "TODO: findOne resource")
 }
 
-func (s *Server) deleteResourceById(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	collectionName := ps.ByName("collectionName")
-
-	if collectionName == schemas.ItemSchemaCollectionName {
-		s.deleteItemSchemaByCollectionName(w, r, ps)
-		return
-	}
-
-	fmt.Fprintf(w, "deleteById")
+func (s *Server) findResourceById(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	fmt.Fprintf(w, "TODO: Find resource by id")
 }
 
-func (s *Server) createItemSchema(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (s *Server) deleteResourceById(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	fmt.Fprintf(w, "TODO: delete resource By Id")
+}
+
+func (s *Server) createItemSchema(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	itemSchema, err := schemas.NewItemSchemaFromReader(r.Body)
 
 	if err != nil {
@@ -104,10 +90,9 @@ func (s *Server) createItemSchema(w http.ResponseWriter, r *http.Request, ps htt
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(itemSchema)
-
 }
 
-func (s *Server) findItemSchema(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (s *Server) findItemSchema(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	filter, err := db.NewFilterFromQueryString(r.URL.RawQuery)
 
 	if err != nil {
@@ -124,15 +109,9 @@ func (s *Server) findItemSchema(w http.ResponseWriter, r *http.Request, ps httpr
 	json.NewEncoder(w).Encode(reply)
 }
 
-func (s *Server) findItemSchemaByCollectionName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	resourceId := ps.ByName("resourceId")
-
-	if resourceId == "findOne" {
-		s.findOneItemSchema(w, r, ps)
-		return
-	}
-
-	itemSchema, err := s.DB.FindItemSchemaByCollectionName(resourceId)
+func (s *Server) findItemSchemaByCollectionName(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+	collectionName := ps["collectionName"]
+	itemSchema, err := s.DB.FindItemSchemaByCollectionName(collectionName)
 	if err != nil {
 		s.writeError(w, err)
 		return
@@ -141,7 +120,7 @@ func (s *Server) findItemSchemaByCollectionName(w http.ResponseWriter, r *http.R
 	json.NewEncoder(w).Encode(itemSchema)
 }
 
-func (s *Server) findOneItemSchema(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (s *Server) findOneItemSchema(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	filter, err := db.NewFilterFromQueryString(r.URL.RawQuery)
 
 	if err != nil {
@@ -158,9 +137,9 @@ func (s *Server) findOneItemSchema(w http.ResponseWriter, r *http.Request, _ htt
 	json.NewEncoder(w).Encode(itemSchema)
 }
 
-func (s *Server) deleteItemSchemaByCollectionName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	resourceId := ps.ByName("resourceId")
-	err := s.DB.DeleteItemSchemaByCollectionName(resourceId)
+func (s *Server) deleteItemSchemaByCollectionName(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+	collectionName := ps["collectionName"]
+	err := s.DB.DeleteItemSchemaByCollectionName(collectionName)
 	if err != nil {
 		s.writeError(w, err)
 		return
