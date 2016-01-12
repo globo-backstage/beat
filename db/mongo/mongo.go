@@ -16,6 +16,8 @@ type MongoConfig struct {
 	Password string
 }
 
+var ItemSchemaNotFound = errors.New("item-schema not found", 404)
+
 type MongoDB struct {
 	config  MongoConfig
 	session *mgo.Session
@@ -57,11 +59,11 @@ func (m *MongoDB) CreateItemSchema(itemSchema *schemas.ItemSchema) errors.Error 
 	defer session.Close()
 	err := session.DB("").C(schemas.ItemSchemaCollectionName).Insert(itemSchema)
 
-	if err == nil {
-		return nil
-	} else {
-		return errors.Wraps(err, 500)
+	if err != nil {
+		return convertMongoError(err)
 	}
+
+	return nil
 }
 
 func (m *MongoDB) FindItemSchema(filter *db.Filter) (*db.ItemSchemasReply, errors.Error) {
@@ -91,7 +93,7 @@ func (m *MongoDB) FindOneItemSchema(filter *db.Filter) (*schemas.ItemSchema, err
 	err := query.One(&itemSchema)
 
 	if err == mgo.ErrNotFound {
-		return nil, errors.New("item-schema not found", 404)
+		return nil, ItemSchemaNotFound
 	} else if err != nil {
 		return nil, errors.Wraps(err, 500)
 	}
@@ -107,7 +109,7 @@ func (m *MongoDB) FindItemSchemaByCollectionName(collectionName string) (*schema
 	err := session.DB("").C(schemas.ItemSchemaCollectionName).FindId(collectionName).One(&itemSchema)
 
 	if err == mgo.ErrNotFound {
-		return nil, errors.Newf(404, `item-schema "%s" not found`, collectionName)
+		return nil, ItemSchemaNotFound
 	} else if err != nil {
 		return nil, errors.Wraps(err, 500)
 	}
@@ -121,7 +123,7 @@ func (m *MongoDB) DeleteItemSchemaByCollectionName(collectionName string) errors
 
 	err := session.DB("").C(schemas.ItemSchemaCollectionName).RemoveId(collectionName)
 	if err == mgo.ErrNotFound {
-		return errors.Newf(404, `item-schema "%s" not found`, collectionName)
+		return ItemSchemaNotFound
 	} else if err != nil {
 		return errors.Wraps(err, 500)
 	}
@@ -155,4 +157,19 @@ func buildMongoWhereByArray(wheres *simplejson.Json, primaryKey string) []bson.M
 		mongoWheres = append(mongoWheres, mongoWhere)
 	}
 	return mongoWheres
+}
+
+func convertMongoError(err error) errors.Error {
+	if mongoErr, ok := err.(*mgo.LastError); ok {
+		if mongoErr.Code == 11000 {
+			return buildMongoDuplicatedError()
+		}
+	}
+	return errors.Wraps(err, 500)
+}
+
+func buildMongoDuplicatedError() errors.Error {
+	validationError := &errors.ValidationError{}
+	validationError.Put("_all", "Duplicated resource")
+	return validationError
 }
