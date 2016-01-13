@@ -1,6 +1,7 @@
-tokens:
-  example1:
-    email: admin@example.net
+auth:
+  tokens:
+    example1:
+      email: admin@example.net
 
-  example2:
-    email: guest@example.net
+    example2:
+      email: guest@example.net
