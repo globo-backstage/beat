@@ -1,10 +1,10 @@
 package mongo
 
 import (
+	_ "github.com/backstage/beat/config"
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
-	_ "github.com/backstage/beat/config"
 	simplejson "github.com/bitly/go-simplejson"
 	"github.com/spf13/viper"
 	"gopkg.in/mgo.v2"
@@ -19,7 +19,7 @@ var ItemSchemaNotFound = errors.New("item-schema not found", 404)
 
 type MongoDB struct {
 	dialInfo *mgo.DialInfo
-	session *mgo.Session
+	session  *mgo.Session
 }
 
 func New() (*MongoDB, error) {
