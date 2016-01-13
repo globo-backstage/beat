@@ -4,48 +4,38 @@ import (
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
+	_ "github.com/backstage/beat/config"
 	simplejson "github.com/bitly/go-simplejson"
-	"github.com/kelseyhightower/envconfig"
+	"github.com/spf13/viper"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
-type MongoConfig struct {
-	Uri      string `default:"localhost:27017/backstage_beat_local"`
-	User     string
-	Password string
+func init() {
+	viper.SetDefault("mongo.uri", "localhost:27017/backstage_beat_local")
 }
 
 var ItemSchemaNotFound = errors.New("item-schema not found", 404)
 
 type MongoDB struct {
-	config  MongoConfig
+	dialInfo *mgo.DialInfo
 	session *mgo.Session
 }
 
 func New() (*MongoDB, error) {
 	d := &MongoDB{}
-	err := envconfig.Process("mongo", &d.config)
 
+	var err error
+	d.dialInfo, err = mgo.ParseURL(viper.GetString("mongo.uri"))
 	if err != nil {
 		return nil, err
 	}
 
-	dialInfo, err := mgo.ParseURL(d.config.Uri)
-	if err != nil {
-		return nil, err
-	}
+	d.dialInfo.Username = viper.GetString("mongo.user")
+	d.dialInfo.Password = viper.GetString("mongo.password")
 
-	if d.config.User != "" {
-		dialInfo.Username = d.config.User
-	}
-
-	if d.config.Password != "" {
-		dialInfo.Password = d.config.Password
-	}
-
-	dialInfo.FailFast = true
-	session, err := mgo.DialWithInfo(dialInfo)
+	d.dialInfo.FailFast = true
+	session, err := mgo.DialWithInfo(d.dialInfo)
 
 	if err != nil {
 		return nil, err

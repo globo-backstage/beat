@@ -41,13 +41,15 @@ func (s *S) TestNewMongoDBConfigWithEnviromentVariables(c *check.C) {
 	db, err := New()
 	c.Assert(err, check.IsNil)
 	c.Assert(db, check.Not(check.IsNil))
-	c.Assert(db.config.Uri, check.Equals, "localhost:27017/backstage_beat_local")
-	c.Assert(db.config.User, check.Equals, "")
-	c.Assert(db.config.Password, check.Equals, "")
+	c.Assert(db.dialInfo.Addrs, check.DeepEquals, []string{"localhost:27017"})
+	c.Assert(db.dialInfo.Database, check.Equals, "backstage_beat_local")
+	c.Assert(db.dialInfo.Username, check.Equals, "")
+	c.Assert(db.dialInfo.Password, check.Equals, "")
 }
 
 func (s *S) TestNewMongoDBConfigWithDefaultVariables(c *check.C) {
-	c.Assert(s.Db.config.Uri, check.Equals, "localhost:27017/backstage_beat_test")
+	c.Assert(s.Db.dialInfo.Addrs, check.DeepEquals, []string{"localhost:27017"})
+	c.Assert(s.Db.dialInfo.Database, check.Equals, "backstage_beat_test")
 }
 
 func (s *S) TestCreateItemSchema(c *check.C) {
