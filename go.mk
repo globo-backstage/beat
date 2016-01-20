@@ -52,7 +52,7 @@ export GOPATH=$(LOCALGOPATH)
 
 # Check current path
 ifeq ($(shell go list ./... 2>/dev/null | grep -q '^_'; echo $$?), 0)
-$(error ERROR!! This directory should be at $(GOPATH)/src/$(REPO)]
+$(error ERROR!! This directory should be at $(GOPATH)/src/$(REPO))
 endif
 
 
