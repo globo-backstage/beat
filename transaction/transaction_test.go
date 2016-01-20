@@ -52,6 +52,7 @@ func (s *S) TestHandle(c *check.C) {
 
 func (s *S) TestWriteError(c *check.C) {
 	s.T.WriteError(errors.New("my error", http.StatusInternalServerError))
+	c.Assert(s.T.statusCode, check.Equals, http.StatusInternalServerError)
 	c.Assert(s.Writer.Code, check.Equals, http.StatusInternalServerError)
 
 	json, err := simplejson.NewFromReader(s.Writer.Body)
@@ -63,6 +64,7 @@ func (s *S) TestWriteError(c *check.C) {
 
 func (s *S) TestNoResultWithStatusCode(c *check.C) {
 	s.T.NoResultWithStatusCode(http.StatusCreated)
+	c.Assert(s.T.statusCode, check.Equals, http.StatusCreated)
 	c.Assert(s.Writer.Code, check.Equals, http.StatusCreated)
 }
 
@@ -72,6 +74,7 @@ func (s *S) TestWriteResult(c *check.C) {
 	}
 	s.T.WriteResult(&result)
 
+	c.Assert(s.T.statusCode, check.Equals, http.StatusOK)
 	c.Assert(s.Writer.Code, check.Equals, http.StatusOK)
 
 	json, err := simplejson.NewFromReader(s.Writer.Body)
@@ -85,10 +88,13 @@ func (s *S) TestWriteResultWithStatusCode(c *check.C) {
 		"test": "with-status-code",
 	}
 	s.T.WriteResultWithStatusCode(http.StatusMethodNotAllowed, &result)
+
+	c.Assert(s.T.statusCode, check.Equals, http.StatusMethodNotAllowed)
 	c.Assert(s.Writer.Code, check.Equals, http.StatusMethodNotAllowed)
 
 	json, err := simplejson.NewFromReader(s.Writer.Body)
 	c.Assert(err, check.IsNil)
+
 	msg := json.Get("test").MustString()
 	c.Assert(msg, check.Equals, "with-status-code")
 }

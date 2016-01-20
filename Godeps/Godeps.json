@@ -11,6 +11,11 @@
 			"Rev": "5c4df71dfe9ac89ef6287afc05e4c1b16ae65a1e"
 		},
 		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.8.7-53-g446d1c1",
+			"Rev": "446d1c146faa8ed3f4218f056fcd165f6bcfda81"
+		},
+		{
 			"ImportPath": "github.com/bitly/go-simplejson",
 			"Comment": "v0.5.0",
 			"Rev": "aabad6e819789e569bd6aabf444c935aa9ba1e44"
@@ -65,6 +70,10 @@
 		{
 			"ImportPath": "github.com/spf13/viper",
 			"Rev": "a212099cbe6fbe8d07476bfda8d2d39b6ff8f325"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "442cd600860ce722f6615730eb008a37a87b13ee"
 		},
 		{
 			"ImportPath": "gopkg.in/check.v1",
