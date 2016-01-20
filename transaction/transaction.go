@@ -87,7 +87,7 @@ func logTransaction(t *Transaction, latency time.Duration) {
 	switch {
 	case t.statusCode >= http.StatusInternalServerError:
 		t.Log.Error(msg)
-	case t.statusCode >= 400 || latency > SlowTransactionWarn:
+	case t.statusCode >= http.StatusBadRequest || latency > SlowTransactionWarn:
 		t.Log.Warn(msg)
 	default:
 		t.Log.Info(msg)
