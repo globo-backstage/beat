@@ -44,6 +44,7 @@ func (s *S) TestHandle(c *check.C) {
 
 	handler(s.Writer, s.Req, map[string]string{"collectionName": "users"})
 
+	c.Assert(capturedTransaction.Id, check.HasLen, 22)
 	c.Assert(capturedTransaction.writer, check.Equals, s.Writer)
 	c.Assert(capturedTransaction.Req, check.Equals, s.Req)
 	c.Assert(capturedTransaction.Params, check.DeepEquals, map[string]string{"collectionName": "users"})
@@ -90,4 +91,30 @@ func (s *S) TestWriteResultWithStatusCode(c *check.C) {
 	c.Assert(err, check.IsNil)
 	msg := json.Get("test").MustString()
 	c.Assert(msg, check.Equals, "with-status-code")
+}
+
+func (s *S) TestIdFromRequestWithEmptyHeader(c *check.C) {
+	r, err := http.NewRequest("GET", "http://localhost", nil)
+	c.Assert(err, check.IsNil)
+
+	id := IdFromRequest(r)
+	c.Assert(id, check.HasLen, 22)
+}
+
+func (s *S) TestIdFromRequestWithFilledHeader(c *check.C) {
+	r, err := http.NewRequest("GET", "http://localhost", nil)
+	c.Assert(err, check.IsNil)
+
+	r.Header.Set("Backstage-Transaction", "BBBBBBBBBBBBBBBBBBBBBZ")
+	id := IdFromRequest(r)
+	c.Assert(id, check.Equals, "BBBBBBBBBBBBBBBBBBBBBZ")
+}
+
+func (s *S) TestIdFromRequestWithBigHeader(c *check.C) {
+	r, err := http.NewRequest("GET", "http://localhost", nil)
+	c.Assert(err, check.IsNil)
+
+	r.Header.Set("Backstage-Transaction", "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
+	id := IdFromRequest(r)
+	c.Assert(id, check.HasLen, 22)
 }
