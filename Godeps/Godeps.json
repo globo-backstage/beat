@@ -47,6 +47,10 @@
 			"Rev": "281073eb9eb092240d33ef253c404f1cca550309"
 		},
 		{
+			"ImportPath": "github.com/satori/go.uuid",
+			"Rev": "08f0718b61e95ddba0ade3346725fe0e4bf28ca6"
+		},
+		{
 			"ImportPath": "github.com/spf13/cast",
 			"Rev": "ee7b3e0353166ab1f3a605294ac8cd2b77953778"
 		},
