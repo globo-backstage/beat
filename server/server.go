@@ -1,12 +1,12 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/backstage/beat/auth"
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
+	"github.com/backstage/beat/transaction"
 	"github.com/dimfeld/httptreemux"
 	"log"
 	"net/http"
@@ -36,11 +36,11 @@ func (s *Server) initRoutes() {
 	s.router.GET("/", s.healthCheck)
 	s.router.GET("/healthcheck", s.healthCheck)
 
-	s.router.POST("/api/item-schemas", s.createItemSchema)
-	s.router.GET("/api/item-schemas", s.findItemSchema)
-	s.router.GET("/api/item-schemas/findOne", s.findOneItemSchema)
-	s.router.GET("/api/item-schemas/:collectionName", s.findItemSchemaByCollectionName)
-	s.router.DELETE("/api/item-schemas/:collectionName", s.deleteItemSchemaByCollectionName)
+	s.router.POST("/api/item-schemas", transaction.Handle(s.createItemSchema))
+	s.router.GET("/api/item-schemas", transaction.Handle(s.findItemSchema))
+	s.router.GET("/api/item-schemas/findOne", transaction.Handle(s.findOneItemSchema))
+	s.router.GET("/api/item-schemas/:collectionName", transaction.Handle(s.findItemSchemaByCollectionName))
+	s.router.DELETE("/api/item-schemas/:collectionName", transaction.Handle(s.deleteItemSchemaByCollectionName))
 
 	s.router.POST("/api/:collectionName", s.createResource)
 	s.router.GET("/api/:collectionName", s.findResource)
@@ -73,82 +73,76 @@ func (s *Server) deleteResourceById(w http.ResponseWriter, r *http.Request, _ ma
 	fmt.Fprintf(w, "TODO: delete resource By Id")
 }
 
-func (s *Server) createItemSchema(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	itemSchema, err := schemas.NewItemSchemaFromReader(r.Body)
+func (s *Server) createItemSchema(t *transaction.Transaction) {
+	itemSchema, err := schemas.NewItemSchemaFromReader(t.Req.Body)
 
 	if err != nil {
-		s.writeError(w, err)
+		t.WriteError(err)
 		return
 	}
 
-	dbErr := s.DB.CreateItemSchema(itemSchema)
+	err = s.DB.CreateItemSchema(itemSchema)
 
-	if dbErr != nil {
-		s.writeError(w, errors.Wraps(dbErr, 500))
+	if err != nil {
+		t.WriteError(err)
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(itemSchema)
+	t.WriteResultWithStatusCode(http.StatusCreated, itemSchema)
 }
 
-func (s *Server) findItemSchema(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	filter, err := db.NewFilterFromQueryString(r.URL.RawQuery)
+func (s *Server) findItemSchema(t *transaction.Transaction) {
+	filter, err := db.NewFilterFromQueryString(t.Req.URL.RawQuery)
 
 	if err != nil {
-		s.writeError(w, errors.Wraps(err, 400))
+		t.WriteError(errors.Wraps(err, 400))
 		return
 	}
 
 	reply, findErr := s.DB.FindItemSchema(filter)
 	if findErr != nil {
-		s.writeError(w, findErr)
+		t.WriteError(findErr)
 		return
 	}
 
-	json.NewEncoder(w).Encode(reply)
+	t.WriteResult(reply)
 }
 
-func (s *Server) findItemSchemaByCollectionName(w http.ResponseWriter, r *http.Request, ps map[string]string) {
-	collectionName := ps["collectionName"]
+func (s *Server) findItemSchemaByCollectionName(t *transaction.Transaction) {
+	collectionName := t.Params["collectionName"]
 	itemSchema, err := s.DB.FindItemSchemaByCollectionName(collectionName)
 	if err != nil {
-		s.writeError(w, err)
+		t.WriteError(err)
 		return
 	}
 
-	json.NewEncoder(w).Encode(itemSchema)
+	t.WriteResult(itemSchema)
 }
 
-func (s *Server) findOneItemSchema(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	filter, err := db.NewFilterFromQueryString(r.URL.RawQuery)
+func (s *Server) findOneItemSchema(t *transaction.Transaction) {
+	filter, err := db.NewFilterFromQueryString(t.Req.URL.RawQuery)
 
 	if err != nil {
-		s.writeError(w, errors.Wraps(err, 400))
+		t.WriteError(errors.Wraps(err, 400))
 		return
 	}
 
 	itemSchema, findErr := s.DB.FindOneItemSchema(filter)
 	if findErr != nil {
-		s.writeError(w, findErr)
+		t.WriteError(findErr)
 		return
 	}
 
-	json.NewEncoder(w).Encode(itemSchema)
+	t.WriteResult(itemSchema)
 }
 
-func (s *Server) deleteItemSchemaByCollectionName(w http.ResponseWriter, r *http.Request, ps map[string]string) {
-	collectionName := ps["collectionName"]
+func (s *Server) deleteItemSchemaByCollectionName(t *transaction.Transaction) {
+	collectionName := t.Params["collectionName"]
 	err := s.DB.DeleteItemSchemaByCollectionName(collectionName)
 	if err != nil {
-		s.writeError(w, err)
+		t.WriteError(err)
 		return
 	}
 
-	w.WriteHeader(204)
-}
-
-func (s *Server) writeError(w http.ResponseWriter, err errors.Error) {
-	w.WriteHeader(err.StatusCode())
-	json.NewEncoder(w).Encode(err)
+	t.NoResultWithStatusCode(http.StatusNoContent)
 }
