@@ -1,10 +1,8 @@
 package transaction
 
 import (
-	//"fmt"
 	simplejson "github.com/bitly/go-simplejson"
 	"gopkg.in/check.v1"
-	//"log"
 	"github.com/backstage/beat/errors"
 	"net/http"
 	"net/http/httptest"
