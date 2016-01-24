@@ -14,5 +14,5 @@ type Database interface {
 }
 
 type ItemSchemasReply struct {
-	Items []schemas.ItemSchema `json:"items"`
+	Items []*schemas.ItemSchema `json:"items"`
 }

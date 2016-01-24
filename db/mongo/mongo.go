@@ -63,7 +63,7 @@ func (m *MongoDB) FindItemSchema(filter *db.Filter) (*db.ItemSchemasReply, error
 	query := session.DB("").C(schemas.ItemSchemaCollectionName).Find(where)
 
 	reply := &db.ItemSchemasReply{}
-	reply.Items = []schemas.ItemSchema{}
+	reply.Items = []*schemas.ItemSchema{}
 	err := query.Skip(filter.Skip()).Limit(filter.PerPage).Iter().All(&reply.Items)
 
 	if err != nil {

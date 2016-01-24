@@ -32,6 +32,7 @@ type ItemSchema struct {
 	Properties           Properties `json:"properties,omitempty"`
 	// used only in draft4
 	Required []string `json:"required,omitempty"`
+	Links    *Links   `json:"links,omitempty"`
 }
 
 // NewItemSchemaFromReader return a new ItemSchema by an io.Reader.
@@ -58,6 +59,11 @@ func (schema *ItemSchema) fillDefaultValues() {
 
 func (schema *ItemSchema) String() string {
 	return fmt.Sprintf(`<ItemSchema "%s">`, schema.CollectionName)
+}
+
+func (schema *ItemSchema) AttachDefaultLinks() {
+	defaultLinks := BuildDefaultLinks(schema.CollectionName)
+	schema.Links = &defaultLinks
 }
 
 func (schema *ItemSchema) validate() errors.Error {

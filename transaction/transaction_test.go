@@ -1,9 +1,9 @@
 package transaction
 
 import (
+	"github.com/backstage/beat/errors"
 	simplejson "github.com/bitly/go-simplejson"
 	"gopkg.in/check.v1"
-	"github.com/backstage/beat/errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
