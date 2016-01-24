@@ -15,18 +15,24 @@ type Link struct {
 	Schema       map[string]interface{} `json:"schema,omitempty" bson:"schema,omitempty"`
 }
 
-type Links []Link
+type Links []*Link
+
+func (l *Links) ApplyBaseUrl(baseUrl string) {
+	for _, link := range *l {
+		link.Href = fmt.Sprintf("%s%s", baseUrl, link.Href)
+	}
+}
 
 func BuildDefaultLinks(collectionName string) Links {
-	collectionUrl := fmt.Sprintf("/api/%s", collectionName)
-	itemUrl := fmt.Sprintf("/api/%s/{id}", collectionName)
+	collectionUrl := fmt.Sprintf("/%s", collectionName)
+	itemUrl := fmt.Sprintf("/%s/{id}", collectionName)
 
 	return Links{
-		Link{Rel: "self", Href: itemUrl},
-		Link{Rel: "item", Href: itemUrl},
-		Link{Rel: "create", Method: "POST", Href: collectionUrl},
-		Link{Rel: "update", Method: "PUT", Href: itemUrl},
-		Link{Rel: "delete", Method: "DELETE", Href: itemUrl},
-		Link{Rel: "parent", Href: collectionUrl},
+		&Link{Rel: "self", Href: itemUrl},
+		&Link{Rel: "item", Href: itemUrl},
+		&Link{Rel: "create", Method: "POST", Href: collectionUrl},
+		&Link{Rel: "update", Method: "PUT", Href: itemUrl},
+		&Link{Rel: "delete", Method: "DELETE", Href: itemUrl},
+		&Link{Rel: "parent", Href: collectionUrl},
 	}
 }

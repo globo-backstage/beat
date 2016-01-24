@@ -105,8 +105,9 @@ func (s *Server) findItemSchema(t *transaction.Transaction) {
 		return
 	}
 
+	baseUrl := t.BaseUrl()
 	for _, itemSchema := range reply.Items {
-		itemSchema.AttachDefaultLinks()
+		itemSchema.AttachDefaultLinks(baseUrl)
 	}
 
 	t.WriteResult(reply)
@@ -119,7 +120,7 @@ func (s *Server) findItemSchemaByCollectionName(t *transaction.Transaction) {
 		t.WriteError(err)
 		return
 	}
-	itemSchema.AttachDefaultLinks()
+	itemSchema.AttachDefaultLinks(t.BaseUrl())
 	t.WriteResult(itemSchema)
 }
 
@@ -137,7 +138,7 @@ func (s *Server) findOneItemSchema(t *transaction.Transaction) {
 		return
 	}
 
-	itemSchema.AttachDefaultLinks()
+	itemSchema.AttachDefaultLinks(t.BaseUrl())
 	t.WriteResult(itemSchema)
 }
 

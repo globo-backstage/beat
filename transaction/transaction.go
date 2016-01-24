@@ -41,13 +41,26 @@ func (t *Transaction) WriteResultWithStatusCode(statusCode int, result interface
 }
 
 func (t *Transaction) WriteResult(result interface{}) {
-	t.statusCode = http.StatusOK
-	json.NewEncoder(t.writer).Encode(result)
+	t.WriteResultWithStatusCode(http.StatusOK, result)
 }
 
 func (t *Transaction) NoResultWithStatusCode(statusCode int) {
 	t.statusCode = statusCode
 	t.writer.WriteHeader(statusCode)
+}
+
+func (t *Transaction) BaseUrl() string {
+	host := t.Req.URL.Host
+	scheme := t.Req.URL.Scheme
+
+	if host == "" {
+		host = t.Req.Host
+	}
+
+	if scheme == "" {
+		scheme = "http"
+	}
+	return fmt.Sprintf("%s://%s/api", scheme, host)
 }
 
 func Handle(handler TransactionHandler) httptreemux.HandlerFunc {

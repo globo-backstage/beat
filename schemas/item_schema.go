@@ -61,9 +61,10 @@ func (schema *ItemSchema) String() string {
 	return fmt.Sprintf(`<ItemSchema "%s">`, schema.CollectionName)
 }
 
-func (schema *ItemSchema) AttachDefaultLinks() {
+func (schema *ItemSchema) AttachDefaultLinks(baseUrl string) {
 	defaultLinks := BuildDefaultLinks(schema.CollectionName)
 	schema.Links = &defaultLinks
+	schema.Links.ApplyBaseUrl(baseUrl)
 }
 
 func (schema *ItemSchema) validate() errors.Error {

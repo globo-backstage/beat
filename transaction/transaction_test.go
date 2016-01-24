@@ -97,6 +97,14 @@ func (s *S) TestWriteResultWithStatusCode(c *check.C) {
 	c.Assert(msg, check.Equals, "with-status-code")
 }
 
+func (s *S) TestBaseUrl(c *check.C) {
+	r, err := http.NewRequest("GET", "http://my-host.com/healtcheck", nil)
+	c.Assert(err, check.IsNil)
+	s.T.Req = r
+
+	c.Assert(s.T.BaseUrl(), check.Equals, "http://my-host.com/api")
+}
+
 func (s *S) TestIdFromRequestWithEmptyHeader(c *check.C) {
 	r, err := http.NewRequest("GET", "http://localhost", nil)
 	c.Assert(err, check.IsNil)
