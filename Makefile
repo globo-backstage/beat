@@ -18,7 +18,7 @@ setup: deps restoregodeps
 
 .PHONY: doc-server
 doc-server:
-	mkdocs serve	
+	mkdocs serve
 
 .PHONY: setup-docs
 setup-docs:
