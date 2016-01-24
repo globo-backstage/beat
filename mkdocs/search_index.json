@@ -1,0 +1,39 @@
+{
+    "docs": [
+        {
+            "location": "/", 
+            "text": "What is Backstage Beat?\n\n\nBackstage Beat is a Backend-as-a-Service software, that makes mobile and web development to be really fast with restful APIs.\n\n\nNote: The software is still in hard development, not ready for production environments", 
+            "title": "Home"
+        }, 
+        {
+            "location": "/#what-is-backstage-beat", 
+            "text": "Backstage Beat is a Backend-as-a-Service software, that makes mobile and web development to be really fast with restful APIs.  Note: The software is still in hard development, not ready for production environments", 
+            "title": "What is Backstage Beat?"
+        }, 
+        {
+            "location": "/getting-started/", 
+            "text": "Installing\n\n\nRequirements\n\n\n\n\nGo 1.5+\n\n\nMongoDB 3+\n\n\n\n\nDownload and install the devolpement version\n\n\nEnsure if your GOPATH environment variable is setted, see more in: https://golang.org/doc/code.html#GOPATH\n\n\ngo get \ngithub.com/backstage/beat/beat\n\ncd $GOPATH/src/github.com/backstage/beat\nmake setup\n\n\n\n\nRun the devolpement version\n\n\nmake run", 
+            "title": "Getting started"
+        }, 
+        {
+            "location": "/getting-started/#installing", 
+            "text": "", 
+            "title": "Installing"
+        }, 
+        {
+            "location": "/getting-started/#requirements", 
+            "text": "Go 1.5+  MongoDB 3+", 
+            "title": "Requirements"
+        }, 
+        {
+            "location": "/getting-started/#download-and-install-the-devolpement-version", 
+            "text": "Ensure if your GOPATH environment variable is setted, see more in: https://golang.org/doc/code.html#GOPATH  go get  github.com/backstage/beat/beat \ncd $GOPATH/src/github.com/backstage/beat\nmake setup", 
+            "title": "Download and install the devolpement version"
+        }, 
+        {
+            "location": "/getting-started/#run-the-devolpement-version", 
+            "text": "make run", 
+            "title": "Run the devolpement version"
+        }
+    ]
+}
