@@ -15,3 +15,15 @@ run:
 
 .PHONY: setup
 setup: deps restoregodeps
+
+.PHONY: doc-server
+doc-server:
+	mkdocs serve	
+
+.PHONY: setup-docs
+setup-docs:
+	pip install -r requirements_docs.txt
+
+.PHONY: deploy-docs
+deploy-docs:
+	mkdocs gh-deploy --clean

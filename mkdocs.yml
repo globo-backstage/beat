@@ -1,0 +1,6 @@
+site_name: Backstage Beat
+theme: readthedocs
+repo_url: https://github.com/backstage/beat
+site_description: Backstage Beat is an open-source backend-as-a-service in heavy development by Globo.com
+site_author: Backstage Developers <backstage1@corp.globo.com>
+copyright: Backstage is Globo.com's Open Source CMS
