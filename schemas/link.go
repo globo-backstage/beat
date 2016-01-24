@@ -23,6 +23,14 @@ func (l Links) ApplyBaseUrl(baseUrl string) {
 		if isRelativeLink(link.Href) {
 			link.Href = fmt.Sprintf("%s%s", baseUrl, link.Href)
 		}
+
+		if ref, ok := link.Schema["$ref"].(string); ok && isRelativeLink(ref) {
+			link.Schema["$ref"] = fmt.Sprintf("%s%s", baseUrl, ref)
+		}
+
+		if ref, ok := link.TargetSchema["$ref"].(string); ok && isRelativeLink(ref) {
+			link.TargetSchema["$ref"] = fmt.Sprintf("%s%s", baseUrl, ref)
+		}
 	}
 }
 

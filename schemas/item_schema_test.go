@@ -195,3 +195,32 @@ func (s *S) TestAttachDefaultLinksWithCustomLinksWithTemplateLink(c *check.C) {
 
 	c.Assert(link, check.DeepEquals, Link{Rel: "view", Href: "{+url}"})
 }
+
+func (s *S) TestAttachDefaultLinksWithCustomLinksWithRefSchema(c *check.C) {
+	schema := `{
+                "collectionName": "backstage-users",
+                "links": [
+                    {
+                      "rel": "view", "href": "/blah",
+                      "schema": {"$ref": "/api/kaka1"},
+                      "targetSchema": {"$ref": "/api/kaka2"}
+                    }
+                ]
+        }`
+	itemSchema, err := NewItemSchemaFromReader(strings.NewReader(schema))
+	c.Assert(err, check.IsNil)
+	itemSchema.AttachDefaultLinks("http://api.mysite.com")
+
+	lenDefaultLinks := len(DefaultLinks)
+	link := *(*itemSchema.Links)[lenDefaultLinks]
+
+	c.Assert(link, check.DeepEquals, Link{
+		Rel: "view", Href: "http://api.mysite.com/blah",
+		Schema: map[string]interface{}{
+			"$ref": "http://api.mysite.com/api/kaka1",
+		},
+		TargetSchema: map[string]interface{}{
+			"$ref": "http://api.mysite.com/api/kaka2",
+		},
+	})
+}
