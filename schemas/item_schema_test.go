@@ -120,3 +120,78 @@ func (s *S) TestNewItemSchemaWithGlobalCollectionName(c *check.C) {
 	c.Assert(err, check.IsNil)
 	c.Assert(itemSchema.GlobalCollectionName, check.Equals, true)
 }
+
+var (
+	DefaultLinks = Links{
+		&Link{Rel: "self", Href: "http://api.mysite.com/backstage-users/{id}"},
+		&Link{Rel: "item", Href: "http://api.mysite.com/backstage-users/{id}"},
+		&Link{Rel: "create", Href: "http://api.mysite.com/backstage-users", Method: "POST"},
+		&Link{Rel: "update", Href: "http://api.mysite.com/backstage-users/{id}", Method: "PUT"},
+		&Link{Rel: "delete", Href: "http://api.mysite.com/backstage-users/{id}", Method: "DELETE"},
+		&Link{Rel: "parent", Href: "http://api.mysite.com/backstage-users"},
+	}
+)
+
+func (s *S) TestAttachDefaultLinks(c *check.C) {
+	schema := `{
+                "collectionName": "backstage-users"
+        }`
+	itemSchema, err := NewItemSchemaFromReader(strings.NewReader(schema))
+	c.Assert(err, check.IsNil)
+	itemSchema.AttachDefaultLinks("http://api.mysite.com")
+
+	for i, expectedLink := range DefaultLinks {
+		link := *(*itemSchema.Links)[i]
+		c.Assert(link, check.DeepEquals, *expectedLink)
+	}
+}
+
+func (s *S) TestAttachDefaultLinksWithCustomLinks(c *check.C) {
+	schema := `{
+                "collectionName": "backstage-users",
+                "links": [
+                    {"rel": "permissions", "href": "/backstage-permissions/{id}"}
+                ]
+        }`
+	itemSchema, err := NewItemSchemaFromReader(strings.NewReader(schema))
+	c.Assert(err, check.IsNil)
+	itemSchema.AttachDefaultLinks("http://api.mysite.com")
+
+	lenDefaultLinks := len(DefaultLinks)
+	link := *(*itemSchema.Links)[lenDefaultLinks]
+	c.Assert(link, check.DeepEquals, Link{Rel: "permissions", Href: "http://api.mysite.com/backstage-permissions/{id}"})
+}
+
+func (s *S) TestAttachDefaultLinksWithCustomLinksWithAbsoluteLink(c *check.C) {
+	schema := `{
+                "collectionName": "backstage-users",
+                "links": [
+                    {"rel": "logs", "href": "http://mylog-service/by-user/{id}"}
+                ]
+        }`
+	itemSchema, err := NewItemSchemaFromReader(strings.NewReader(schema))
+	c.Assert(err, check.IsNil)
+	itemSchema.AttachDefaultLinks("http://api.mysite.com")
+
+	lenDefaultLinks := len(DefaultLinks)
+	link := *(*itemSchema.Links)[lenDefaultLinks]
+
+	c.Assert(link, check.DeepEquals, Link{Rel: "logs", Href: "http://mylog-service/by-user/{id}"})
+}
+
+func (s *S) TestAttachDefaultLinksWithCustomLinksWithTemplateLink(c *check.C) {
+	schema := `{
+                "collectionName": "backstage-users",
+                "links": [
+                    {"rel": "view", "href": "{+url}"}
+                ]
+        }`
+	itemSchema, err := NewItemSchemaFromReader(strings.NewReader(schema))
+	c.Assert(err, check.IsNil)
+	itemSchema.AttachDefaultLinks("http://api.mysite.com")
+
+	lenDefaultLinks := len(DefaultLinks)
+	link := *(*itemSchema.Links)[lenDefaultLinks]
+
+	c.Assert(link, check.DeepEquals, Link{Rel: "view", Href: "{+url}"})
+}

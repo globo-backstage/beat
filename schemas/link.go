@@ -2,6 +2,7 @@ package schemas
 
 import (
 	"fmt"
+	"net/url"
 )
 
 type Link struct {
@@ -17,10 +18,27 @@ type Link struct {
 
 type Links []*Link
 
-func (l *Links) ApplyBaseUrl(baseUrl string) {
-	for _, link := range *l {
-		link.Href = fmt.Sprintf("%s%s", baseUrl, link.Href)
+func (l Links) ApplyBaseUrl(baseUrl string) {
+	for _, link := range l {
+		if isRelativeLink(link.Href) {
+			link.Href = fmt.Sprintf("%s%s", baseUrl, link.Href)
+		}
 	}
+}
+
+// ConcatenateLinks generate new links with merge with tailLinks
+func (l Links) ConcatenateLinks(tailLinks *Links) *Links {
+	currentSize := len(l)
+	expandSize := len(*tailLinks)
+
+	newLinks := make(Links, currentSize+expandSize)
+	copy(newLinks, l)
+
+	for i, link := range *tailLinks {
+		newLinks[currentSize+i] = link
+	}
+
+	return &newLinks
 }
 
 func BuildDefaultLinks(collectionName string) Links {
@@ -35,4 +53,18 @@ func BuildDefaultLinks(collectionName string) Links {
 		&Link{Rel: "delete", Method: "DELETE", Href: itemUrl},
 		&Link{Rel: "parent", Href: collectionUrl},
 	}
+}
+
+func isRelativeLink(link string) bool {
+	url, err := url.Parse(link)
+
+	if err != nil {
+		return false
+	}
+
+	return url.Host == "" && url.Scheme == "" && !isUriTemplate(link)
+}
+
+func isUriTemplate(link string) bool {
+	return len(link) > 0 && link[0] == '{'
 }

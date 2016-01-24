@@ -62,8 +62,14 @@ func (schema *ItemSchema) String() string {
 }
 
 func (schema *ItemSchema) AttachDefaultLinks(baseUrl string) {
+	customLinks := schema.Links
 	defaultLinks := BuildDefaultLinks(schema.CollectionName)
+
 	schema.Links = &defaultLinks
+
+	if customLinks != nil {
+		schema.Links = schema.Links.ConcatenateLinks(customLinks)
+	}
 	schema.Links.ApplyBaseUrl(baseUrl)
 }
 
