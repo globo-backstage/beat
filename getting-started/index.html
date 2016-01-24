@@ -76,6 +76,11 @@
                     <li><a class="toctree-l4" href="#run-the-devolpement-version">Run the devolpement version</a></li>
                 
             
+                <li class="toctree-l3"><a href="#using-with-curl">Using (with Curl)</a></li>
+                
+                    <li><a class="toctree-l4" href="#create-a-new-collection">Create a new collection</a></li>
+                
+            
             </ul>
         
     </li>
@@ -132,6 +137,93 @@ make setup
 
 <h3 id="run-the-devolpement-version">Run the devolpement version</h3>
 <pre><code>make run
+</code></pre>
+
+<h1 id="using-with-curl">Using (with Curl)</h1>
+<h3 id="create-a-new-collection">Create a new collection</h3>
+<p>To dynamically define a new collection just create a new instance of the ItemSchema. Doing this via the REST interface is as simples as POSTing a valid JSON Schema, as follows:</p>
+<h6 id="schemajson">schema.json</h6>
+<pre><code class="json">{
+  &quot;collectionName&quot;: &quot;people&quot;,
+  &quot;globalCollectionName&quot;: true,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;title&quot;: &quot;Person&quot;,
+  &quot;collectionTitle&quot;: &quot;People&quot;,
+  &quot;properties&quot;: {
+    &quot;name&quot;: {
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;email&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;format&quot;: &quot;email&quot;
+    }
+  }
+}
+</code></pre>
+
+<p>Create a Person model from a JSON Schema</p>
+<pre><code>curl -i -XPOST -H &quot;Content-Type: application/json&quot; http://beat-service-example.org/api/item-schemas -T schema.json
+</code></pre>
+
+<p>The REstful API will then be available at http://beat-service-example.org/api/people.</p>
+<h4 id="default-links">Default links</h4>
+<p>Each Item schema have a default set of links which correspond to the basic CRUD operations supported by Backstage-Beat.</p>
+<p>For example:</p>
+<pre><code>$ curl http://beat-service-example.org/api/item-schemas/people
+</code></pre>
+
+<p>returns</p>
+<pre><code class="json">{
+  &quot;$schema&quot;: &quot;http://json-schema.org/draft-04/hyper-schema#&quot;,
+  &quot;collectionName&quot;: &quot;people&quot;,
+  ...
+  &quot;links&quot;: [
+    {
+      &quot;rel&quot;: &quot;self&quot;,
+      &quot;href&quot;: &quot;http://beat-service-example.org/api/people/{id}&quot;
+    },
+    {
+      &quot;rel&quot;: &quot;item&quot;,
+      &quot;href&quot;: &quot;http://beat-service-example.org/api/people/{id}&quot;
+    },
+    {
+      &quot;rel&quot;: &quot;create&quot;,
+      &quot;href&quot;: &quot;http://beat-service-example.org/api/people&quot;,
+      &quot;method&quot;: &quot;POST&quot;
+    },
+    {
+      &quot;rel&quot;: &quot;update&quot;,
+      &quot;href&quot;: &quot;http://beat-service-example.org/api/people/{id}&quot;,
+      &quot;method&quot;: &quot;PUT&quot;
+    },
+    {
+      &quot;rel&quot;: &quot;delete&quot;,
+      &quot;href&quot;: &quot;http://beat-service-example.org/api/people/{id}&quot;,
+      &quot;method&quot;: &quot;DELETE&quot;
+    },
+    {
+      &quot;rel&quot;: &quot;parent&quot;,
+      &quot;href&quot;: &quot;http://beat-service-example.org/api/people&quot;
+    }
+  ]
+}
+</code></pre>
+
+<h4 id="including-custom-links-in-an-item-schema">Including custom links in an item schema</h4>
+<p>It is possible to include custom links in an item schema. To do so, just include them in the links property:</p>
+<pre><code class="json">{
+  &quot;type&quot;: &quot;object&quot;,
+  ...
+  &quot;properties&quot;: {
+    ...
+  },
+  &quot;links&quot;: [
+    {
+      &quot;rel&quot;: &quot;my-custom-item-schema-link&quot;,
+      &quot;href&quot;: &quot;http://example.org/my/custom/item-schema-link&quot;
+    }
+  ]
+}
 </code></pre>
               
             </div>
