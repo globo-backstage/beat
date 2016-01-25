@@ -189,7 +189,10 @@ make setup
     {
       &quot;rel&quot;: &quot;create&quot;,
       &quot;href&quot;: &quot;http://beat-service-example.org/api/people&quot;,
-      &quot;method&quot;: &quot;POST&quot;
+      &quot;method&quot;: &quot;POST&quot;,
+      &quot;schema&quot;: {
+        &quot;$ref&quot;: &quot;http://beat-service-example.org/api/item-schemas/people&quot;
+      }
     },
     {
       &quot;rel&quot;: &quot;update&quot;,
