@@ -1,11 +1,12 @@
 ## What is Backstage Beat?
 
-Backstage Beat is an open-source Backend-as-a-Service software, that makes mobile and web development to be really fast with restful APIs.
+Backstage Beat is a Backend-as-a-Service software that makes mobile and web development really fast using restful APIs.
 
-**Note: The software is still in hard development, not ready for production environments**
+**Attention: Beat is in early development and is not ready for production yet.**
 
 ### Related projects
-This project's inspired by the following projects:
+
+Backstage Beat is inspired by the following projects:
 
 * [StrongLoop/Loopback](https://github.com/strongloop/loopback)
 * [Parse.com](http://parse.com/)
