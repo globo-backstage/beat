@@ -2,22 +2,22 @@
     "docs": [
         {
             "location": "/", 
-            "text": "What is Backstage Beat?\n\n\nBackstage Beat is an open-source Backend-as-a-Service software, that makes mobile and web development to be really fast with restful APIs.\n\n\nNote: The software is still in hard development, not ready for production environments\n\n\nRelated projects\n\n\nThis project's inspired by the following projects:\n\n\n\n\nStrongLoop/Loopback\n\n\nParse.com", 
+            "text": "What is Backstage Beat?\n\n\nBackstage Beat is a Backend-as-a-Service software that makes mobile and web development really fast using restful APIs.\n\n\nAttention: Beat is in early development and is not ready for production yet.\n\n\nRelated projects\n\n\nBackstage Beat is inspired by the following projects:\n\n\n\n\nStrongLoop/Loopback\n\n\nParse.com", 
             "title": "Home"
         }, 
         {
             "location": "/#what-is-backstage-beat", 
-            "text": "Backstage Beat is an open-source Backend-as-a-Service software, that makes mobile and web development to be really fast with restful APIs.  Note: The software is still in hard development, not ready for production environments", 
+            "text": "Backstage Beat is a Backend-as-a-Service software that makes mobile and web development really fast using restful APIs.  Attention: Beat is in early development and is not ready for production yet.", 
             "title": "What is Backstage Beat?"
         }, 
         {
             "location": "/#related-projects", 
-            "text": "This project's inspired by the following projects:   StrongLoop/Loopback  Parse.com", 
+            "text": "Backstage Beat is inspired by the following projects:   StrongLoop/Loopback  Parse.com", 
             "title": "Related projects"
         }, 
         {
             "location": "/getting-started/", 
-            "text": "Installing\n\n\nRequirements\n\n\n\n\nGo 1.5+\n\n\nMongoDB 3+\n\n\n\n\nDownload and install the devolpement version\n\n\nEnsure if your GOPATH environment variable is setted, see more in: https://golang.org/doc/code.html#GOPATH\n\n\ngo get \ngithub.com/backstage/beat/beat\n\ncd $GOPATH/src/github.com/backstage/beat\nmake setup\n\n\n\n\nRun the devolpement version\n\n\nmake run\n\n\n\n\nUsing (with Curl)\n\n\nCreate a new collection\n\n\nTo dynamically define a new collection just create a new instance of the ItemSchema. Doing this via the REST interface is as simples as POSTing a valid JSON Schema, as follows:\n\n\nschema.json\n\n\n{\n  \ncollectionName\n: \npeople\n,\n  \nglobalCollectionName\n: true,\n  \ntype\n: \nobject\n,\n  \ntitle\n: \nPerson\n,\n  \ncollectionTitle\n: \nPeople\n,\n  \nproperties\n: {\n    \nname\n: {\n      \ntype\n: \nstring\n\n    },\n    \nemail\n: {\n      \ntype\n: \nstring\n,\n      \nformat\n: \nemail\n\n    }\n  }\n}\n\n\n\n\nCreate a Person model from a JSON Schema\n\n\ncurl -i -XPOST -H \nContent-Type: application/json\n http://beat-service-example.org/api/item-schemas -T schema.json\n\n\n\n\nThe REstful API will then be available at http://beat-service-example.org/api/people.\n\n\nDefault links\n\n\nEach Item schema have a default set of links which correspond to the basic CRUD operations supported by Backstage-Beat.\n\n\nFor example:\n\n\n$ curl http://beat-service-example.org/api/item-schemas/people\n\n\n\n\nreturns\n\n\n{\n  \n$schema\n: \nhttp://json-schema.org/draft-04/hyper-schema#\n,\n  \ncollectionName\n: \npeople\n,\n  ...\n  \nlinks\n: [\n    {\n      \nrel\n: \nself\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n\n    },\n    {\n      \nrel\n: \nitem\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n\n    },\n    {\n      \nrel\n: \ncreate\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people\n,\n      \nmethod\n: \nPOST\n,\n      \nschema\n: {\n        \n$ref\n: \nhttp://beat-service-example.org/api/item-schemas/people\n\n      }\n    },\n    {\n      \nrel\n: \nupdate\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n,\n      \nmethod\n: \nPUT\n\n    },\n    {\n      \nrel\n: \ndelete\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n,\n      \nmethod\n: \nDELETE\n\n    },\n    {\n      \nrel\n: \nparent\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people\n\n    }\n  ]\n}\n\n\n\n\nIncluding custom links in an item schema\n\n\nIt is possible to include custom links in an item schema. To do so, just include them in the links property:\n\n\n{\n  \ntype\n: \nobject\n,\n  ...\n  \nproperties\n: {\n    ...\n  },\n  \nlinks\n: [\n    {\n      \nrel\n: \nmy-custom-item-schema-link\n,\n      \nhref\n: \nhttp://example.org/my/custom/item-schema-link\n\n    }\n  ]\n}", 
+            "text": "Installing\n\n\nRequirements\n\n\n\n\nGo 1.5+\n\n\nMongoDB 3+\n\n\n\n\nDownload and install the development version\n\n\n\n\nEnsure that you have your \nGOPATH\n environment variable properly configured. Check the \nGo docs\n to see how to id:\n\n\n\n\ngo get \ngithub.com/backstage/beat/beat\n\ncd $GOPATH/src/github.com/backstage/beat\nmake setup\n\n\n\n\nRunning locally\n\n\nmake run\n\n\n\n\nUsing (with \ncurl\n)\n\n\nCreate a new collection\n\n\nTo dynamically define a new collection, just create a new instance of the \nItemSchema\n. You can do this using the REST interface to \nPOST\n a valid JSON Schema. First define your schema as below:\n\n\nschema.json\n\n\n{\n  \ncollectionName\n: \npeople\n,\n  \nglobalCollectionName\n: true,\n  \ntype\n: \nobject\n,\n  \ntitle\n: \nPerson\n,\n  \ncollectionTitle\n: \nPeople\n,\n  \nproperties\n: {\n    \nname\n: {\n      \ntype\n: \nstring\n\n    },\n    \nemail\n: {\n      \ntype\n: \nstring\n,\n      \nformat\n: \nemail\n\n    }\n  }\n}\n\n\n\n\nThen you can create a \nPerson\n collection by POSTing the JSON Schema above:\n\n\ncurl -i -XPOST -H \nContent-Type: application/json\n http://beat-service-example.org/api/item-schemas -T schema.json\n\n\n\n\nThat is it. The RESTful API will then be available at http://beat-service-example.org/api/people.\n\n\nDefault links\n\n\nEach Item schema have a default set of links which correspond to the basic CRUD operations supported by Backstage Beat. For example:\n\n\n$ curl http://beat-service-example.org/api/item-schemas/people\n\n\n\n\nreturns\n\n\n{\n  \n$schema\n: \nhttp://json-schema.org/draft-04/hyper-schema#\n,\n  \ncollectionName\n: \npeople\n,\n  ...\n  \nlinks\n: [\n    {\n      \nrel\n: \nself\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n\n    },\n    {\n      \nrel\n: \nitem\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n\n    },\n    {\n      \nrel\n: \ncreate\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people\n,\n      \nmethod\n: \nPOST\n,\n      \nschema\n: {\n        \n$ref\n: \nhttp://beat-service-example.org/api/item-schemas/people\n\n      }\n    },\n    {\n      \nrel\n: \nupdate\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n,\n      \nmethod\n: \nPUT\n\n    },\n    {\n      \nrel\n: \ndelete\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n,\n      \nmethod\n: \nDELETE\n\n    },\n    {\n      \nrel\n: \nparent\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people\n\n    }\n  ]\n}\n\n\n\n\nIncluding custom links in an Item Schema\n\n\nIt is possible to include custom links in an Item Schema. To do so, just include them in the links property of your JSON:\n\n\n{\n  \ntype\n: \nobject\n,\n  ...\n  \nproperties\n: {\n    ...\n  },\n  \nlinks\n: [\n    {\n      \nrel\n: \nmy-custom-item-schema-link\n,\n      \nhref\n: \nhttp://example.org/my/custom/item-schema-link\n\n    }\n  ]\n}", 
             "title": "Getting started"
         }, 
         {
@@ -31,39 +31,39 @@
             "title": "Requirements"
         }, 
         {
-            "location": "/getting-started/#download-and-install-the-devolpement-version", 
-            "text": "Ensure if your GOPATH environment variable is setted, see more in: https://golang.org/doc/code.html#GOPATH  go get  github.com/backstage/beat/beat \ncd $GOPATH/src/github.com/backstage/beat\nmake setup", 
-            "title": "Download and install the devolpement version"
+            "location": "/getting-started/#download-and-install-the-development-version", 
+            "text": "Ensure that you have your  GOPATH  environment variable properly configured. Check the  Go docs  to see how to id:   go get  github.com/backstage/beat/beat \ncd $GOPATH/src/github.com/backstage/beat\nmake setup", 
+            "title": "Download and install the development version"
         }, 
         {
-            "location": "/getting-started/#run-the-devolpement-version", 
+            "location": "/getting-started/#running-locally", 
             "text": "make run", 
-            "title": "Run the devolpement version"
+            "title": "Running locally"
         }, 
         {
             "location": "/getting-started/#using-with-curl", 
             "text": "", 
-            "title": "Using (with Curl)"
+            "title": "Using (with curl)"
         }, 
         {
             "location": "/getting-started/#create-a-new-collection", 
-            "text": "To dynamically define a new collection just create a new instance of the ItemSchema. Doing this via the REST interface is as simples as POSTing a valid JSON Schema, as follows:", 
+            "text": "To dynamically define a new collection, just create a new instance of the  ItemSchema . You can do this using the REST interface to  POST  a valid JSON Schema. First define your schema as below:", 
             "title": "Create a new collection"
         }, 
         {
             "location": "/getting-started/#schemajson", 
-            "text": "{\n   collectionName :  people ,\n   globalCollectionName : true,\n   type :  object ,\n   title :  Person ,\n   collectionTitle :  People ,\n   properties : {\n     name : {\n       type :  string \n    },\n     email : {\n       type :  string ,\n       format :  email \n    }\n  }\n}  Create a Person model from a JSON Schema  curl -i -XPOST -H  Content-Type: application/json  http://beat-service-example.org/api/item-schemas -T schema.json  The REstful API will then be available at http://beat-service-example.org/api/people.", 
+            "text": "{\n   collectionName :  people ,\n   globalCollectionName : true,\n   type :  object ,\n   title :  Person ,\n   collectionTitle :  People ,\n   properties : {\n     name : {\n       type :  string \n    },\n     email : {\n       type :  string ,\n       format :  email \n    }\n  }\n}  Then you can create a  Person  collection by POSTing the JSON Schema above:  curl -i -XPOST -H  Content-Type: application/json  http://beat-service-example.org/api/item-schemas -T schema.json  That is it. The RESTful API will then be available at http://beat-service-example.org/api/people.", 
             "title": "schema.json"
         }, 
         {
             "location": "/getting-started/#default-links", 
-            "text": "Each Item schema have a default set of links which correspond to the basic CRUD operations supported by Backstage-Beat.  For example:  $ curl http://beat-service-example.org/api/item-schemas/people  returns  {\n   $schema :  http://json-schema.org/draft-04/hyper-schema# ,\n   collectionName :  people ,\n  ...\n   links : [\n    {\n       rel :  self ,\n       href :  http://beat-service-example.org/api/people/{id} \n    },\n    {\n       rel :  item ,\n       href :  http://beat-service-example.org/api/people/{id} \n    },\n    {\n       rel :  create ,\n       href :  http://beat-service-example.org/api/people ,\n       method :  POST ,\n       schema : {\n         $ref :  http://beat-service-example.org/api/item-schemas/people \n      }\n    },\n    {\n       rel :  update ,\n       href :  http://beat-service-example.org/api/people/{id} ,\n       method :  PUT \n    },\n    {\n       rel :  delete ,\n       href :  http://beat-service-example.org/api/people/{id} ,\n       method :  DELETE \n    },\n    {\n       rel :  parent ,\n       href :  http://beat-service-example.org/api/people \n    }\n  ]\n}", 
+            "text": "Each Item schema have a default set of links which correspond to the basic CRUD operations supported by Backstage Beat. For example:  $ curl http://beat-service-example.org/api/item-schemas/people  returns  {\n   $schema :  http://json-schema.org/draft-04/hyper-schema# ,\n   collectionName :  people ,\n  ...\n   links : [\n    {\n       rel :  self ,\n       href :  http://beat-service-example.org/api/people/{id} \n    },\n    {\n       rel :  item ,\n       href :  http://beat-service-example.org/api/people/{id} \n    },\n    {\n       rel :  create ,\n       href :  http://beat-service-example.org/api/people ,\n       method :  POST ,\n       schema : {\n         $ref :  http://beat-service-example.org/api/item-schemas/people \n      }\n    },\n    {\n       rel :  update ,\n       href :  http://beat-service-example.org/api/people/{id} ,\n       method :  PUT \n    },\n    {\n       rel :  delete ,\n       href :  http://beat-service-example.org/api/people/{id} ,\n       method :  DELETE \n    },\n    {\n       rel :  parent ,\n       href :  http://beat-service-example.org/api/people \n    }\n  ]\n}", 
             "title": "Default links"
         }, 
         {
             "location": "/getting-started/#including-custom-links-in-an-item-schema", 
-            "text": "It is possible to include custom links in an item schema. To do so, just include them in the links property:  {\n   type :  object ,\n  ...\n   properties : {\n    ...\n  },\n   links : [\n    {\n       rel :  my-custom-item-schema-link ,\n       href :  http://example.org/my/custom/item-schema-link \n    }\n  ]\n}", 
-            "title": "Including custom links in an item schema"
+            "text": "It is possible to include custom links in an Item Schema. To do so, just include them in the links property of your JSON:  {\n   type :  object ,\n  ...\n   properties : {\n    ...\n  },\n   links : [\n    {\n       rel :  my-custom-item-schema-link ,\n       href :  http://example.org/my/custom/item-schema-link \n    }\n  ]\n}", 
+            "title": "Including custom links in an Item Schema"
         }
     ]
 }

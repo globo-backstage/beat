@@ -71,14 +71,11 @@
                 
                     <li><a class="toctree-l4" href="#requirements">Requirements</a></li>
                 
-                    <li><a class="toctree-l4" href="#download-and-install-the-devolpement-version">Download and install the devolpement version</a></li>
+                    <li><a class="toctree-l4" href="#download-and-install-the-development-version">Download and install the development version</a></li>
                 
-                    <li><a class="toctree-l4" href="#run-the-devolpement-version">Run the devolpement version</a></li>
+                    <li><a class="toctree-l4" href="#running-locally">Running locally</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#using-with-curl">Using (with Curl)</a></li>
-                
-                    <li><a class="toctree-l4" href="#create-a-new-collection">Create a new collection</a></li>
+                    <li><a class="toctree-l4" href="#using-with-curl">Using (with curl)</a></li>
                 
             
             </ul>
@@ -123,26 +120,28 @@
             <div class="section">
               
                 <h1 id="installing">Installing</h1>
-<h3 id="requirements">Requirements</h3>
+<h2 id="requirements">Requirements</h2>
 <ul>
 <li>Go 1.5+</li>
 <li>MongoDB 3+</li>
 </ul>
-<h3 id="download-and-install-the-devolpement-version">Download and install the devolpement version</h3>
-<p>Ensure if your GOPATH environment variable is setted, see more in: https://golang.org/doc/code.html#GOPATH</p>
+<h2 id="download-and-install-the-development-version">Download and install the development version</h2>
+<blockquote>
+<p>Ensure that you have your <code>GOPATH</code> environment variable properly configured. Check the <a href="https://golang.org/doc/code.html#GOPATH">Go docs</a> to see how to id:</p>
+</blockquote>
 <pre><code class="bash">go get &quot;github.com/backstage/beat/beat&quot;
 cd $GOPATH/src/github.com/backstage/beat
 make setup
 </code></pre>
 
-<h3 id="run-the-devolpement-version">Run the devolpement version</h3>
+<h2 id="running-locally">Running locally</h2>
 <pre><code>make run
 </code></pre>
 
-<h1 id="using-with-curl">Using (with Curl)</h1>
+<h2 id="using-with-curl">Using (with <code>curl</code>)</h2>
 <h3 id="create-a-new-collection">Create a new collection</h3>
-<p>To dynamically define a new collection just create a new instance of the ItemSchema. Doing this via the REST interface is as simples as POSTing a valid JSON Schema, as follows:</p>
-<h6 id="schemajson">schema.json</h6>
+<p>To dynamically define a new collection, just create a new instance of the <code>ItemSchema</code>. You can do this using the REST interface to <code>POST</code> a valid JSON Schema. First define your schema as below:</p>
+<h5 id="schemajson"><code>schema.json</code></h5>
 <pre><code class="json">{
   &quot;collectionName&quot;: &quot;people&quot;,
   &quot;globalCollectionName&quot;: true,
@@ -161,15 +160,14 @@ make setup
 }
 </code></pre>
 
-<p>Create a Person model from a JSON Schema</p>
-<pre><code>curl -i -XPOST -H &quot;Content-Type: application/json&quot; http://beat-service-example.org/api/item-schemas -T schema.json
+<p>Then you can create a <code>Person</code> collection by POSTing the JSON Schema above:</p>
+<pre><code class="bash">curl -i -XPOST -H &quot;Content-Type: application/json&quot; http://beat-service-example.org/api/item-schemas -T schema.json
 </code></pre>
 
-<p>The REstful API will then be available at http://beat-service-example.org/api/people.</p>
+<p>That is it. The RESTful API will then be available at http://beat-service-example.org/api/people.</p>
 <h4 id="default-links">Default links</h4>
-<p>Each Item schema have a default set of links which correspond to the basic CRUD operations supported by Backstage-Beat.</p>
-<p>For example:</p>
-<pre><code>$ curl http://beat-service-example.org/api/item-schemas/people
+<p>Each Item schema have a default set of links which correspond to the basic CRUD operations supported by Backstage Beat. For example:</p>
+<pre><code class="bash">$ curl http://beat-service-example.org/api/item-schemas/people
 </code></pre>
 
 <p>returns</p>
@@ -212,8 +210,8 @@ make setup
 }
 </code></pre>
 
-<h4 id="including-custom-links-in-an-item-schema">Including custom links in an item schema</h4>
-<p>It is possible to include custom links in an item schema. To do so, just include them in the links property:</p>
+<h4 id="including-custom-links-in-an-item-schema">Including custom links in an Item Schema</h4>
+<p>It is possible to include custom links in an Item Schema. To do so, just include them in the links property of your JSON:</p>
 <pre><code class="json">{
   &quot;type&quot;: &quot;object&quot;,
   ...
