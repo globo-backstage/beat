@@ -82,7 +82,10 @@ returns
     {
       "rel": "create",
       "href": "http://beat-service-example.org/api/people",
-      "method": "POST"
+      "method": "POST",
+      "schema": {
+        "$ref": "http://beat-service-example.org/api/item-schemas/people"
+      }
     },
     {
       "rel": "update",

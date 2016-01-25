@@ -125,7 +125,11 @@ var (
 	DefaultLinks = Links{
 		&Link{Rel: "self", Href: "http://api.mysite.com/backstage-users/{id}"},
 		&Link{Rel: "item", Href: "http://api.mysite.com/backstage-users/{id}"},
-		&Link{Rel: "create", Href: "http://api.mysite.com/backstage-users", Method: "POST"},
+		&Link{Rel: "create", Href: "http://api.mysite.com/backstage-users", Method: "POST",
+			Schema: map[string]interface{}{
+				"$ref": "http://api.mysite.com/item-schemas/backstage-users",
+			},
+		},
 		&Link{Rel: "update", Href: "http://api.mysite.com/backstage-users/{id}", Method: "PUT"},
 		&Link{Rel: "delete", Href: "http://api.mysite.com/backstage-users/{id}", Method: "DELETE"},
 		&Link{Rel: "parent", Href: "http://api.mysite.com/backstage-users"},
