@@ -80,7 +80,7 @@ func (s *Server) createItemSchema(t *transaction.Transaction) {
 		t.WriteError(err)
 		return
 	}
-
+	itemSchema.DiscardDefaultLinks()
 	err = s.DB.CreateItemSchema(itemSchema)
 
 	if err != nil {
@@ -88,6 +88,7 @@ func (s *Server) createItemSchema(t *transaction.Transaction) {
 		return
 	}
 
+	itemSchema.AttachDefaultLinks(t.BaseUrl())
 	t.WriteResultWithStatusCode(http.StatusCreated, itemSchema)
 }
 

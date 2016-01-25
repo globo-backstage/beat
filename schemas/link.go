@@ -16,6 +16,10 @@ type Link struct {
 	Schema       map[string]interface{} `json:"schema,omitempty" bson:"schema,omitempty"`
 }
 
+var (
+	DefaultLinkRels = []string{"self", "item", "create", "update", "delete", "parent"}
+)
+
 type Links []*Link
 
 func (l Links) ApplyBaseUrl(baseUrl string) {
@@ -46,6 +50,17 @@ func (l Links) ConcatenateLinks(tailLinks *Links) *Links {
 		newLinks[currentSize+i] = link
 	}
 
+	return &newLinks
+}
+
+// DiscardDefaultLinks remove all default links to store only custom links
+func (l Links) DiscardDefaultLinks() *Links {
+	newLinks := make(Links, 0, len(l))
+	for _, link := range l {
+		if !isDefaultRel(link.Rel) {
+			newLinks = append(newLinks, link)
+		}
+	}
 	return &newLinks
 }
 
@@ -80,4 +95,13 @@ func isRelativeLink(link string) bool {
 
 func isUriTemplate(link string) bool {
 	return len(link) > 0 && link[0] == '{'
+}
+
+func isDefaultRel(linkRel string) bool {
+	for _, defaultLinkRel := range DefaultLinkRels {
+		if defaultLinkRel == linkRel {
+			return true
+		}
+	}
+	return false
 }

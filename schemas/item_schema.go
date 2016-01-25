@@ -73,6 +73,12 @@ func (schema *ItemSchema) AttachDefaultLinks(baseUrl string) {
 	schema.Links.ApplyBaseUrl(baseUrl)
 }
 
+func (schema *ItemSchema) DiscardDefaultLinks() {
+	if schema.Links != nil {
+		schema.Links = schema.Links.DiscardDefaultLinks()
+	}
+}
+
 func (schema *ItemSchema) validate() errors.Error {
 	validation := &errors.ValidationError{}
 

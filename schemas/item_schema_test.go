@@ -228,3 +228,50 @@ func (s *S) TestAttachDefaultLinksWithCustomLinksWithRefSchema(c *check.C) {
 		},
 	})
 }
+
+func (s *S) TestDiscardDefaultLinks(c *check.C) {
+	schema := `{
+                "collectionName": "backstage-users",
+                "links": [
+                    {
+                      "rel": "self",
+                      "href": "/hacked-url"
+                    }
+                ]
+        }`
+	itemSchema, err := NewItemSchemaFromReader(strings.NewReader(schema))
+	c.Assert(err, check.IsNil)
+	itemSchema.DiscardDefaultLinks()
+	c.Assert(*itemSchema.Links, check.HasLen, 0)
+}
+
+func (s *S) TestDiscardDefaultLinksWithCustomLinks(c *check.C) {
+	schema := `{
+                "collectionName": "backstage-users",
+                "links": [
+                    {
+                      "rel": "customLink1",
+                      "href": "/hacked-url1"
+                    },
+                    {
+                      "rel": "create",
+                      "href": "/api/user"
+                    },
+                    {
+                      "rel": "customLink2",
+                      "href": "/hacked-url2"
+                    }
+                ]
+        }`
+	itemSchema, err := NewItemSchemaFromReader(strings.NewReader(schema))
+	c.Assert(err, check.IsNil)
+	itemSchema.DiscardDefaultLinks()
+
+	c.Assert(*itemSchema.Links, check.HasLen, 2)
+
+	link := *(*itemSchema.Links)[0]
+	c.Assert(link, check.DeepEquals, Link{Rel: "customLink1", Href: "/hacked-url1"})
+
+	link = *(*itemSchema.Links)[1]
+	c.Assert(link, check.DeepEquals, Link{Rel: "customLink2", Href: "/hacked-url2"})
+}
