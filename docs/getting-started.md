@@ -1,13 +1,13 @@
 # Installing
 
-### Requirements
+## Requirements
 
 - Go 1.5+
 - MongoDB 3+
 
-### Download and install the devolpement version
+## Download and install the development version
 
-Ensure if your GOPATH environment variable is setted, see more in: https://golang.org/doc/code.html#GOPATH
+> Ensure that you have your `GOPATH` environment variable properly configured. Check the [Go docs](https://golang.org/doc/code.html#GOPATH) to see how to id:
 
 ```bash
 go get "github.com/backstage/beat/beat"
@@ -15,19 +15,20 @@ cd $GOPATH/src/github.com/backstage/beat
 make setup
 ```
 
-### Run the devolpement version
+## Running locally
 
 ```
 make run
 ```
 
-# Using (with Curl)
+## Using (with `curl`)
 
 ### Create a new collection
 
-To dynamically define a new collection just create a new instance of the ItemSchema. Doing this via the REST interface is as simples as POSTing a valid JSON Schema, as follows:
+To dynamically define a new collection, just create a new instance of the `ItemSchema`. You can do this using the REST interface to `POST` a valid JSON Schema. First define your schema as below:
 
-###### schema.json
+##### `schema.json`
+
 ```json
 {
   "collectionName": "people",
@@ -47,20 +48,19 @@ To dynamically define a new collection just create a new instance of the ItemSch
 }
 ```
 
-Create a Person model from a JSON Schema
-```
+Then you can create a `Person` collection by POSTing the JSON Schema above:
+
+```bash
 curl -i -XPOST -H "Content-Type: application/json" http://beat-service-example.org/api/item-schemas -T schema.json
 ```
 
-The REstful API will then be available at http://beat-service-example.org/api/people.
+That is it. The RESTful API will then be available at http://beat-service-example.org/api/people.
 
 #### Default links
 
-Each Item schema have a default set of links which correspond to the basic CRUD operations supported by Backstage-Beat.
+Each Item schema have a default set of links which correspond to the basic CRUD operations supported by Backstage Beat. For example:
 
-For example:
-
-```
+```bash
 $ curl http://beat-service-example.org/api/item-schemas/people
 ```
 
@@ -105,9 +105,9 @@ returns
 }
 ```
 
-#### Including custom links in an item schema
+#### Including custom links in an Item Schema
 
-It is possible to include custom links in an item schema. To do so, just include them in the links property:
+It is possible to include custom links in an Item Schema. To do so, just include them in the links property of your JSON:
 
 ```json
 {
