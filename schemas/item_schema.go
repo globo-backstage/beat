@@ -34,7 +34,7 @@ type ItemSchema struct {
 	Properties           Properties `json:"properties,omitempty"`
 	Required             []string   `json:"required,omitempty"` // used only in draft4
 	Links                *Links     `json:"links,omitempty"`
-	CollectionLinks      *Links     `json:"links,omitempty"`
+	CollectionLinks      *Links     `json:"collectionLinks,omitempty"`
 }
 
 // NewItemSchemaFromReader return a new ItemSchema by an io.Reader.
@@ -65,9 +65,7 @@ func (schema *ItemSchema) String() string {
 
 func (schema *ItemSchema) AttachDefaultLinks(baseUrl string) {
 	customLinks := schema.Links
-	defaultLinks := BuildDefaultLinks(schema.CollectionName)
-
-	schema.Links = &defaultLinks
+	schema.Links = schema.defaultLinks()
 
 	if customLinks != nil {
 		schema.Links = schema.Links.ConcatenateLinks(customLinks)
@@ -105,4 +103,31 @@ func (schema *ItemSchema) validate() errors.Error {
 	}
 
 	return nil
+}
+
+func (schema *ItemSchema) collectionUrl() string {
+	return fmt.Sprintf("/%s", schema.CollectionName)
+}
+
+func (schema *ItemSchema) url() string {
+	return fmt.Sprintf("/%s/%s", ItemSchemaCollectionName, schema.CollectionName)
+}
+
+func (schema *ItemSchema) defaultLinks() *Links {
+	collectionUrl := schema.collectionUrl()
+	schemaUrl := schema.url()
+	itemUrl := fmt.Sprintf("/%s/{id}", schema.CollectionName)
+
+	return &Links{
+		&Link{Rel: "self", Href: itemUrl},
+		&Link{Rel: "item", Href: itemUrl},
+		&Link{Rel: "create", Method: "POST", Href: collectionUrl,
+			Schema: map[string]interface{}{
+				"$ref": schemaUrl,
+			},
+		},
+		&Link{Rel: "update", Method: "PUT", Href: itemUrl},
+		&Link{Rel: "delete", Method: "DELETE", Href: itemUrl},
+		&Link{Rel: "parent", Href: collectionUrl},
+	}
 }

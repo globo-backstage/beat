@@ -64,25 +64,6 @@ func (l Links) DiscardDefaultLinks() *Links {
 	return &newLinks
 }
 
-func BuildDefaultLinks(collectionName string) Links {
-	collectionUrl := fmt.Sprintf("/%s", collectionName)
-	itemUrl := fmt.Sprintf("/%s/{id}", collectionName)
-	schemaUrl := fmt.Sprintf("/%s/%s", ItemSchemaCollectionName, collectionName)
-
-	return Links{
-		&Link{Rel: "self", Href: itemUrl},
-		&Link{Rel: "item", Href: itemUrl},
-		&Link{Rel: "create", Method: "POST", Href: collectionUrl,
-			Schema: map[string]interface{}{
-				"$ref": schemaUrl,
-			},
-		},
-		&Link{Rel: "update", Method: "PUT", Href: itemUrl},
-		&Link{Rel: "delete", Method: "DELETE", Href: itemUrl},
-		&Link{Rel: "parent", Href: collectionUrl},
-	}
-}
-
 func isRelativeLink(link string) bool {
 	url, err := url.Parse(link)
 
