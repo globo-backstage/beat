@@ -101,5 +101,7 @@ func (s *Server) findCollectionSchemaByCollectionName(t *transaction.Transaction
 		return
 	}
 	collectionSchema := schemas.NewCollectionSchema(itemSchema)
+	collectionSchema.ApplyBaseUrl(t.BaseUrl())
+
 	t.WriteResult(collectionSchema)
 }

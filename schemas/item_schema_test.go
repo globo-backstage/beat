@@ -122,7 +122,7 @@ func (s *S) TestNewItemSchemaWithGlobalCollectionName(c *check.C) {
 }
 
 var (
-	DefaultLinks = Links{
+	DefaultItemSchemaLinks = Links{
 		&Link{Rel: "self", Href: "http://api.mysite.com/backstage-users/{id}"},
 		&Link{Rel: "item", Href: "http://api.mysite.com/backstage-users/{id}"},
 		&Link{Rel: "create", Href: "http://api.mysite.com/backstage-users", Method: "POST",
@@ -144,7 +144,7 @@ func (s *S) TestAttachDefaultLinks(c *check.C) {
 	c.Assert(err, check.IsNil)
 	itemSchema.AttachDefaultLinks("http://api.mysite.com")
 
-	for i, expectedLink := range DefaultLinks {
+	for i, expectedLink := range DefaultItemSchemaLinks {
 		link := *(*itemSchema.Links)[i]
 		c.Assert(link, check.DeepEquals, *expectedLink)
 	}
@@ -161,7 +161,7 @@ func (s *S) TestAttachDefaultLinksWithCustomLinks(c *check.C) {
 	c.Assert(err, check.IsNil)
 	itemSchema.AttachDefaultLinks("http://api.mysite.com")
 
-	lenDefaultLinks := len(DefaultLinks)
+	lenDefaultLinks := len(DefaultItemSchemaLinks)
 	link := *(*itemSchema.Links)[lenDefaultLinks]
 	c.Assert(link, check.DeepEquals, Link{Rel: "permissions", Href: "http://api.mysite.com/backstage-permissions/{id}"})
 }
@@ -177,7 +177,7 @@ func (s *S) TestAttachDefaultLinksWithCustomLinksWithAbsoluteLink(c *check.C) {
 	c.Assert(err, check.IsNil)
 	itemSchema.AttachDefaultLinks("http://api.mysite.com")
 
-	lenDefaultLinks := len(DefaultLinks)
+	lenDefaultLinks := len(DefaultItemSchemaLinks)
 	link := *(*itemSchema.Links)[lenDefaultLinks]
 
 	c.Assert(link, check.DeepEquals, Link{Rel: "logs", Href: "http://mylog-service/by-user/{id}"})
@@ -194,7 +194,7 @@ func (s *S) TestAttachDefaultLinksWithCustomLinksWithTemplateLink(c *check.C) {
 	c.Assert(err, check.IsNil)
 	itemSchema.AttachDefaultLinks("http://api.mysite.com")
 
-	lenDefaultLinks := len(DefaultLinks)
+	lenDefaultLinks := len(DefaultItemSchemaLinks)
 	link := *(*itemSchema.Links)[lenDefaultLinks]
 
 	c.Assert(link, check.DeepEquals, Link{Rel: "view", Href: "{+url}"})
@@ -215,7 +215,7 @@ func (s *S) TestAttachDefaultLinksWithCustomLinksWithRefSchema(c *check.C) {
 	c.Assert(err, check.IsNil)
 	itemSchema.AttachDefaultLinks("http://api.mysite.com")
 
-	lenDefaultLinks := len(DefaultLinks)
+	lenDefaultLinks := len(DefaultItemSchemaLinks)
 	link := *(*itemSchema.Links)[lenDefaultLinks]
 
 	c.Assert(link, check.DeepEquals, Link{
