@@ -88,3 +88,18 @@ func (s *Server) deleteItemSchemaByCollectionName(t *transaction.Transaction) {
 
 	t.NoResultWithStatusCode(http.StatusNoContent)
 }
+
+func (s *Server) findCollectionSchemaByCollectionName(t *transaction.Transaction) {
+	collectionName := t.Params["collectionName"]
+	itemSchema, err := s.DB.FindItemSchemaByCollectionName(collectionName)
+
+	if err == db.ItemSchemaNotFound {
+		t.WriteError(db.CollectionSchemaNotFound)
+		return
+	} else if err != nil {
+		t.WriteError(err)
+		return
+	}
+	collectionSchema := schemas.NewCollectionSchema(itemSchema)
+	t.WriteResult(collectionSchema)
+}

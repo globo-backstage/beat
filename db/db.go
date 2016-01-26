@@ -5,6 +5,9 @@ import (
 	"github.com/backstage/beat/schemas"
 )
 
+var ItemSchemaNotFound = errors.New("item-schema not found", 404)
+var CollectionSchemaNotFound = errors.New("collection-schema not found", 404)
+
 type Database interface {
 	CreateItemSchema(*schemas.ItemSchema) errors.Error
 	FindItemSchema(*Filter) (*ItemSchemasReply, errors.Error)

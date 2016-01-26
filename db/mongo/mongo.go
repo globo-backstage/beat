@@ -15,8 +15,6 @@ func init() {
 	viper.SetDefault("mongo.uri", "localhost:27017/backstage_beat_local")
 }
 
-var ItemSchemaNotFound = errors.New("item-schema not found", 404)
-
 type MongoDB struct {
 	dialInfo *mgo.DialInfo
 	session  *mgo.Session
@@ -83,7 +81,7 @@ func (m *MongoDB) FindOneItemSchema(filter *db.Filter) (*schemas.ItemSchema, err
 	err := query.One(&itemSchema)
 
 	if err == mgo.ErrNotFound {
-		return nil, ItemSchemaNotFound
+		return nil, db.ItemSchemaNotFound
 	} else if err != nil {
 		return nil, errors.Wraps(err, 500)
 	}
@@ -99,7 +97,7 @@ func (m *MongoDB) FindItemSchemaByCollectionName(collectionName string) (*schema
 	err := session.DB("").C(schemas.ItemSchemaCollectionName).FindId(collectionName).One(&itemSchema)
 
 	if err == mgo.ErrNotFound {
-		return nil, ItemSchemaNotFound
+		return nil, db.ItemSchemaNotFound
 	} else if err != nil {
 		return nil, errors.Wraps(err, 500)
 	}
@@ -113,7 +111,7 @@ func (m *MongoDB) DeleteItemSchemaByCollectionName(collectionName string) errors
 
 	err := session.DB("").C(schemas.ItemSchemaCollectionName).RemoveId(collectionName)
 	if err == mgo.ErrNotFound {
-		return ItemSchemaNotFound
+		return db.ItemSchemaNotFound
 	} else if err != nil {
 		return errors.Wraps(err, 500)
 	}

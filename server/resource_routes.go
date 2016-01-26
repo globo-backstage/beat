@@ -1,8 +1,8 @@
 package server
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 )
 
 func (s *Server) createResource(w http.ResponseWriter, r *http.Request, _ map[string]string) {

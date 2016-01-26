@@ -26,13 +26,15 @@ type Properties map[string]map[string]interface{}
 type ItemSchema struct {
 	Schema               string     `json:"$schema" bson:"%20schema"`
 	CollectionName       string     `json:"collectionName" bson:"_id"`
+	Title                string     `json:"title,omitempty"`
+	CollectionTitle      string     `json:"collectionTitle,omitempty"`
 	GlobalCollectionName bool       `json:"globalCollectionName,omitempty"" bson:"globalCollectionName"`
 	AditionalProperties  *bool      `json:"aditionalProperties,omitempty" bson:"aditionalProperties"`
 	Type                 string     `json:"type"`
 	Properties           Properties `json:"properties,omitempty"`
-	// used only in draft4
-	Required []string `json:"required,omitempty"`
-	Links    *Links   `json:"links,omitempty"`
+	Required             []string   `json:"required,omitempty"` // used only in draft4
+	Links                *Links     `json:"links,omitempty"`
+	CollectionLinks      *Links     `json:"links,omitempty"`
 }
 
 // NewItemSchemaFromReader return a new ItemSchema by an io.Reader.
