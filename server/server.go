@@ -42,7 +42,7 @@ func (s *Server) initRoutes() {
 
 	s.router.GET("/api/collection-schemas/:collectionName", transaction.Handle(s.findCollectionSchemaByCollectionName))
 
-	s.router.POST("/api/:collectionName", s.createResource)
+	s.router.POST("/api/:collectionName", transaction.Handle(s.createResource))
 	s.router.GET("/api/:collectionName", s.findResource)
 	s.router.GET("/api/:collectionName/findOne", s.findOneResource)
 	s.router.GET("/api/:collectionName/:resourceId", s.findResourceById)
