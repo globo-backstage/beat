@@ -30,6 +30,14 @@
 			"Rev": "420c236181cb7c905b61f9b9209ea7b71e6cae20"
 		},
 		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "836b6e58b3358112c8291565d01c35b8764070d7"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "836b6e58b3358112c8291565d01c35b8764070d7"
+		},
+		{
 			"ImportPath": "github.com/hashicorp/hcl",
 			"Rev": "197e8d3cf42199cfd53cd775deb37f3637234635"
 		},

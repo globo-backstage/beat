@@ -137,7 +137,7 @@ func (s *S) TestDeleteItemSchemaByCollectionNameWithNotFound(c *check.C) {
 }
 
 func (s *S) TestDeleteItemSchemaByCollectionName(c *check.C) {
-	dbErr := s.Db.CreateItemSchema(&schemas.ItemSchema{CollectionName: fmt.Sprintf("to-be-deleted")})
+	dbErr := s.Db.CreateItemSchema(&schemas.ItemSchema{CollectionName: "to-be-deleted"})
 	c.Assert(dbErr, check.IsNil)
 
 	dbErr = s.Db.DeleteItemSchemaByCollectionName("to-be-deleted")
