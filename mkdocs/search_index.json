@@ -16,6 +16,36 @@
             "title": "Related projects"
         }, 
         {
+            "location": "/configuration/", 
+            "text": "Settings\n\n\nBackstage Beat is very configurable, all configurations are available below.\n\n\nCore\n\n\n\n\n\n\n\n\nYaml path\n\n\nEnviroment variable\n\n\nDefault value\n\n\nDescription\n\n\n\n\n\n\n\n\n\n\nlog.level\n\n\nLOG_LEVEL\n\n\ninfo\n\n\nApplication log level, are available: debug, info, warn, error, fatal and panic.\n\n\n\n\n\n\nhost\n\n\nHOST\n\n\n0.0.0.0\n\n\nHost to serve API.\n\n\n\n\n\n\nport\n\n\nPORT\n\n\n3000\n\n\nPort to serve API.\n\n\n\n\n\n\n\n\nDatabase Engines\n\n\nMongoDB\n\n\n\n\n\n\n\n\nYaml path\n\n\nEnviroment variable\n\n\nDefault value\n\n\nDescription\n\n\n\n\n\n\n\n\n\n\nmongo.uri\n\n\nMONGO_URI\n\n\nlocalhost:27017/backstage_beat_local\n\n\nDatabase URL.\n\n\n\n\n\n\nmongo.user\n\n\nMONGO_USER\n\n\nNone\n\n\nUsername.\n\n\n\n\n\n\nmongo.password\n\n\nMONGO_PASSWORD\n\n\nNone\n\n\nPassword.\n\n\n\n\n\n\nmongo.failFast\n\n\nMONGO_FAILFAST\n\n\ntrue\n\n\nCause connection and query attempts to fail faster when the server is unavailable.\n\n\n\n\n\n\n\n\nRedis\n\n\n\n\n\n\n\n\nYaml path\n\n\nEnviroment variable\n\n\nDefault value\n\n\nDescription\n\n\n\n\n\n\n\n\n\n\nredis.host\n\n\nREDIS_HOST\n\n\nlocalhost:6379\n\n\nHost and port.\n\n\n\n\n\n\nredis.db\n\n\nREDIS_DB\n\n\n0\n\n\nDatabase.\n\n\n\n\n\n\nredis.pool.maxIdle\n\n\nREDIS_POOL_MAXIDLE\n\n\n10\n\n\nMaximum number of idle connections in the pool.\n\n\n\n\n\n\nredis.pool.maxActive\n\n\nREDIS_POOL_MAXACTIVE\n\n\n10\n\n\nMaximum number of connections allocated by the pool at a given time. When zero, there is no limit on the number of connections in the pool.\n\n\n\n\n\n\nredis.pool.wait\n\n\nREDIS_POOL_WAIT\n\n\ntrue\n\n\nIf true and the pool is at the \nredis.pool.maxActive\n limit, waits for a connection to be returned to the pool.\n\n\n\n\n\n\nredis.pool.idleTimeout\n\n\nREDIS_POOL_IDLETIMEOUT\n\n\n180e9\n\n\nClose connections after remaining idle for this duration.", 
+            "title": "Configuration"
+        }, 
+        {
+            "location": "/configuration/#settings", 
+            "text": "Backstage Beat is very configurable, all configurations are available below.", 
+            "title": "Settings"
+        }, 
+        {
+            "location": "/configuration/#core", 
+            "text": "Yaml path  Enviroment variable  Default value  Description      log.level  LOG_LEVEL  info  Application log level, are available: debug, info, warn, error, fatal and panic.    host  HOST  0.0.0.0  Host to serve API.    port  PORT  3000  Port to serve API.", 
+            "title": "Core"
+        }, 
+        {
+            "location": "/configuration/#database-engines", 
+            "text": "", 
+            "title": "Database Engines"
+        }, 
+        {
+            "location": "/configuration/#mongodb", 
+            "text": "Yaml path  Enviroment variable  Default value  Description      mongo.uri  MONGO_URI  localhost:27017/backstage_beat_local  Database URL.    mongo.user  MONGO_USER  None  Username.    mongo.password  MONGO_PASSWORD  None  Password.    mongo.failFast  MONGO_FAILFAST  true  Cause connection and query attempts to fail faster when the server is unavailable.", 
+            "title": "MongoDB"
+        }, 
+        {
+            "location": "/configuration/#redis", 
+            "text": "Yaml path  Enviroment variable  Default value  Description      redis.host  REDIS_HOST  localhost:6379  Host and port.    redis.db  REDIS_DB  0  Database.    redis.pool.maxIdle  REDIS_POOL_MAXIDLE  10  Maximum number of idle connections in the pool.    redis.pool.maxActive  REDIS_POOL_MAXACTIVE  10  Maximum number of connections allocated by the pool at a given time. When zero, there is no limit on the number of connections in the pool.    redis.pool.wait  REDIS_POOL_WAIT  true  If true and the pool is at the  redis.pool.maxActive  limit, waits for a connection to be returned to the pool.    redis.pool.idleTimeout  REDIS_POOL_IDLETIMEOUT  180e9  Close connections after remaining idle for this duration.", 
+            "title": "Redis"
+        }, 
+        {
             "location": "/getting-started/", 
             "text": "Installing\n\n\nRequirements\n\n\n\n\nGo 1.5+\n\n\nMongoDB 3+\n\n\n\n\nDownload and install the development version\n\n\n\n\nEnsure that you have your \nGOPATH\n environment variable properly configured. Check the \nGo docs\n to see how to id:\n\n\n\n\ngo get \ngithub.com/backstage/beat/beat\n\ncd $GOPATH/src/github.com/backstage/beat\nmake setup\n\n\n\n\nRunning locally\n\n\nmake run\n\n\n\n\nUsing (with \ncurl\n)\n\n\nCreate a new collection\n\n\nTo dynamically define a new collection, just create a new instance of the \nItemSchema\n. You can do this using the REST interface to \nPOST\n a valid JSON Schema. First define your schema as below:\n\n\nschema.json\n\n\n{\n  \ncollectionName\n: \npeople\n,\n  \nglobalCollectionName\n: true,\n  \ntype\n: \nobject\n,\n  \ntitle\n: \nPerson\n,\n  \ncollectionTitle\n: \nPeople\n,\n  \nproperties\n: {\n    \nname\n: {\n      \ntype\n: \nstring\n\n    },\n    \nemail\n: {\n      \ntype\n: \nstring\n,\n      \nformat\n: \nemail\n\n    }\n  }\n}\n\n\n\n\nThen you can create a \nPerson\n collection by POSTing the JSON Schema above:\n\n\ncurl -i -XPOST -H \nContent-Type: application/json\n http://beat-service-example.org/api/item-schemas -T schema.json\n\n\n\n\nThat is it. The RESTful API will then be available at http://beat-service-example.org/api/people.\n\n\nDefault links\n\n\nEach Item schema have a default set of links which correspond to the basic CRUD operations supported by Backstage Beat. For example:\n\n\n$ curl http://beat-service-example.org/api/item-schemas/people\n\n\n\n\nreturns\n\n\n{\n  \n$schema\n: \nhttp://json-schema.org/draft-04/hyper-schema#\n,\n  \ncollectionName\n: \npeople\n,\n  ...\n  \nlinks\n: [\n    {\n      \nrel\n: \nself\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n\n    },\n    {\n      \nrel\n: \nitem\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n\n    },\n    {\n      \nrel\n: \ncreate\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people\n,\n      \nmethod\n: \nPOST\n,\n      \nschema\n: {\n        \n$ref\n: \nhttp://beat-service-example.org/api/item-schemas/people\n\n      }\n    },\n    {\n      \nrel\n: \nupdate\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n,\n      \nmethod\n: \nPUT\n\n    },\n    {\n      \nrel\n: \ndelete\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people/{id}\n,\n      \nmethod\n: \nDELETE\n\n    },\n    {\n      \nrel\n: \nparent\n,\n      \nhref\n: \nhttp://beat-service-example.org/api/people\n\n    }\n  ]\n}\n\n\n\n\nIncluding custom links in an Item Schema\n\n\nIt is possible to include custom links in an Item Schema. To do so, just include them in the links property of your JSON:\n\n\n{\n  \ntype\n: \nobject\n,\n  ...\n  \nproperties\n: {\n    ...\n  },\n  \nlinks\n: [\n    {\n      \nrel\n: \nmy-custom-item-schema-link\n,\n      \nhref\n: \nhttp://example.org/my/custom/item-schema-link\n\n    }\n  ]\n}", 
             "title": "Getting started"
