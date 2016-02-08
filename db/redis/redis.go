@@ -9,6 +9,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"github.com/spf13/viper"
 	"net/http"
+	"time"
 )
 
 var (
@@ -26,6 +27,10 @@ type Redis struct {
 func init() {
 	viper.SetDefault("redis.host", "localhost:6379")
 	viper.SetDefault("redis.db", 0)
+	viper.SetDefault("redis.pool.maxIdle", 10)
+	viper.SetDefault("redis.pool.maxActive", 10)
+	viper.SetDefault("redis.pool.wait", true)
+	viper.SetDefault("redis.pool.idleTimeout", 180e9)
 }
 
 func New() (*Redis, error) {
@@ -53,10 +58,10 @@ func New() (*Redis, error) {
 
 			return conn, nil
 		},
-		MaxIdle:     10,
-		MaxActive:   20,
-		Wait:        true,
-		IdleTimeout: 180e9,
+		MaxIdle:     viper.GetInt("redis.pool.maxIdle"),
+		MaxActive:   viper.GetInt("redis.pool.maxActive"),
+		Wait:        viper.GetBool("redis.pool.wait"),
+		IdleTimeout: time.Duration(viper.GetInt("redis.pool.idleTimeout")),
 	}
 
 	return d, nil

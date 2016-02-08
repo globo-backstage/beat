@@ -1,7 +1,9 @@
 package config
 
 import (
+	"github.com/Sirupsen/logrus"
 	"github.com/spf13/viper"
+	"log"
 	"os"
 	"strings"
 )
@@ -18,7 +20,15 @@ func ReadConfigFile(filePath string) error {
 func init() {
 	viper.SetConfigType("yaml")
 	viper.AutomaticEnv()
-
 	envReplacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(envReplacer)
+
+	viper.SetDefault("log.level", "info")
+	logLevel, err := logrus.ParseLevel(viper.GetString("log.level"))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	logrus.SetLevel(logLevel)
 }
