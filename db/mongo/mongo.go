@@ -1,7 +1,6 @@
 package mongo
 
 import (
-	"fmt"
 	_ "github.com/backstage/beat/config"
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
