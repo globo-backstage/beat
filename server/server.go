@@ -2,11 +2,12 @@ package server
 
 import (
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/backstage/beat/auth"
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/transaction"
 	"github.com/dimfeld/httptreemux"
-	"log"
+	"github.com/spf13/viper"
 	"net/http"
 )
 
@@ -14,6 +15,11 @@ type Server struct {
 	Authentication auth.Authable
 	DB             db.Database
 	router         *httptreemux.TreeMux
+}
+
+func init() {
+	viper.SetDefault("host", "0.0.0.0")
+	viper.SetDefault("port", 3000)
 }
 
 func New(authentication auth.Authable, db db.Database) *Server {
@@ -26,7 +32,9 @@ func New(authentication auth.Authable, db db.Database) *Server {
 }
 
 func (s *Server) Run() {
-	log.Fatal(http.ListenAndServe(":3000", s.router))
+	bind := fmt.Sprintf("%s:%d", viper.GetString("host"), viper.GetInt("port"))
+	log.Infof("Backstage Beat is running on http://%s/", bind)
+	log.Fatal(http.ListenAndServe(bind, s.router))
 }
 
 func (s *Server) initRoutes() {

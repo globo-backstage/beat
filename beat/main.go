@@ -21,6 +21,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	config.LoadLogSettings()
 	authentication := auth.NewFileAuthentication()
 	db, err := mongo.New()
 

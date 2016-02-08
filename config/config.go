@@ -24,6 +24,9 @@ func init() {
 	viper.SetEnvKeyReplacer(envReplacer)
 
 	viper.SetDefault("log.level", "info")
+}
+
+func LoadLogSettings() {
 	logLevel, err := logrus.ParseLevel(viper.GetString("log.level"))
 
 	if err != nil {

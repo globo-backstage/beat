@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"fmt"
 	_ "github.com/backstage/beat/config"
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
@@ -13,6 +14,7 @@ import (
 
 func init() {
 	viper.SetDefault("mongo.uri", "localhost:27017/backstage_beat_local")
+	viper.SetDefault("mongo.failFast", true)
 }
 
 type MongoDB struct {
@@ -32,7 +34,7 @@ func New() (*MongoDB, error) {
 	d.dialInfo.Username = viper.GetString("mongo.user")
 	d.dialInfo.Password = viper.GetString("mongo.password")
 
-	d.dialInfo.FailFast = true
+	d.dialInfo.FailFast = viper.GetBool("mongo.failFast")
 	session, err := mgo.DialWithInfo(d.dialInfo)
 
 	if err != nil {
