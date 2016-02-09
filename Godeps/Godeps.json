@@ -38,6 +38,10 @@
 			"Rev": "836b6e58b3358112c8291565d01c35b8764070d7"
 		},
 		{
+			"ImportPath": "github.com/golang/mock/gomock",
+			"Rev": "bd3c8e81be01eef76d4b503f5e687d2d1354d2d9"
+		},
+		{
 			"ImportPath": "github.com/hashicorp/hcl",
 			"Rev": "197e8d3cf42199cfd53cd775deb37f3637234635"
 		},
