@@ -56,13 +56,13 @@ func (s *S) TestCreateItemSchemaDuplicated(c *check.C) {
 func (s *S) TestFindItemSchemaByCollectionNameWithNotFound(c *check.C) {
 	_, dbErr := s.Db.FindItemSchemaByCollectionName("not-found")
 	c.Assert(dbErr, check.NotNil)
-	c.Assert(dbErr.StatusCode(), check.Equals, 404)
+	c.Assert(dbErr.StatusCode(), check.Equals, http.StatusNotFound)
 }
 
 func (s *S) TestDeleteItemSchemaByCollectionNameWithNotFound(c *check.C) {
 	dbErr := s.Db.DeleteItemSchemaByCollectionName("not-found")
 	c.Assert(dbErr, check.NotNil)
-	c.Assert(dbErr.StatusCode(), check.Equals, 404)
+	c.Assert(dbErr.StatusCode(), check.Equals, http.StatusNotFound)
 }
 
 func (s *S) TestDeleteItemSchemaByCollectionName(c *check.C) {
@@ -74,7 +74,7 @@ func (s *S) TestDeleteItemSchemaByCollectionName(c *check.C) {
 
 	_, dbErr = s.Db.FindItemSchemaByCollectionName("to-be-deleted")
 	c.Assert(dbErr, check.NotNil)
-	c.Assert(dbErr.StatusCode(), check.Equals, 404)
+	c.Assert(dbErr.StatusCode(), check.Equals, http.StatusNotFound)
 }
 
 func (s *S) TestFindItemSchema(c *check.C) {

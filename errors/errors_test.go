@@ -5,6 +5,7 @@ import (
 	originalErrors "errors"
 	simplejson "github.com/bitly/go-simplejson"
 	"gopkg.in/check.v1"
+	"net/http"
 	"testing"
 )
 
@@ -17,28 +18,28 @@ func Test(t *testing.T) {
 }
 
 func (s *S) TestWrapsNewError(c *check.C) {
-	err := Wraps(originalErrors.New("test error 123"), 503)
+	err := Wraps(originalErrors.New("test error 123"), http.StatusInternalServerError)
 	c.Assert(err, check.Not(check.IsNil))
 	c.Assert(err.Error(), check.Equals, "test error 123")
-	c.Assert(err.StatusCode(), check.Equals, 503)
+	c.Assert(err.StatusCode(), check.Equals, http.StatusInternalServerError)
 }
 
 func (s *S) TestNewError(c *check.C) {
-	err := New("test error 123", 503)
+	err := New("test error 123", http.StatusInternalServerError)
 	c.Assert(err, check.Not(check.IsNil))
 	c.Assert(err.Error(), check.Equals, "test error 123")
-	c.Assert(err.StatusCode(), check.Equals, 503)
+	c.Assert(err.StatusCode(), check.Equals, http.StatusInternalServerError)
 }
 
 func (s *S) TestNewfError(c *check.C) {
-	err := Newf(503, "test error %s", "123")
+	err := Newf(http.StatusInternalServerError, "test error %s", "123")
 	c.Assert(err, check.Not(check.IsNil))
 	c.Assert(err.Error(), check.Equals, "test error 123")
-	c.Assert(err.StatusCode(), check.Equals, 503)
+	c.Assert(err.StatusCode(), check.Equals, http.StatusInternalServerError)
 }
 
 func (s *S) TestMarshallJSONWrappedError(c *check.C) {
-	errWrapped := Wraps(originalErrors.New("test error 123"), 503)
+	errWrapped := Wraps(originalErrors.New("test error 123"), http.StatusInternalServerError)
 
 	data, err1 := json.Marshal(errWrapped)
 	c.Assert(err1, check.IsNil)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/backstage/beat/errors"
 	"io"
+	"net/http"
 	"regexp"
 )
 
@@ -43,7 +44,7 @@ func NewItemSchemaFromReader(r io.Reader) (*ItemSchema, errors.Error) {
 	itemSchema := &ItemSchema{}
 	err := json.NewDecoder(r).Decode(itemSchema)
 	if err != nil {
-		return nil, errors.Wraps(err, 400)
+		return nil, errors.Wraps(err, http.StatusBadRequest)
 	}
 	itemSchema.fillDefaultValues()
 	return itemSchema, itemSchema.validate()

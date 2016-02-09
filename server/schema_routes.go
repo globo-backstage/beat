@@ -31,7 +31,7 @@ func (s *Server) findItemSchema(t *transaction.Transaction) {
 	filter, err := db.NewFilterFromQueryString(t.Req.URL.RawQuery)
 
 	if err != nil {
-		t.WriteError(errors.Wraps(err, 400))
+		t.WriteError(errors.Wraps(err, http.StatusBadRequest))
 		return
 	}
 
@@ -64,7 +64,7 @@ func (s *Server) findOneItemSchema(t *transaction.Transaction) {
 	filter, err := db.NewFilterFromQueryString(t.Req.URL.RawQuery)
 
 	if err != nil {
-		t.WriteError(errors.Wraps(err, 400))
+		t.WriteError(errors.Wraps(err, http.StatusBadRequest))
 		return
 	}
 

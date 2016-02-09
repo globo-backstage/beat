@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"net/http"
 )
 
 func init() {
@@ -70,7 +71,7 @@ func (m *MongoDB) FindItemSchema(filter *db.Filter) (*db.ItemSchemasReply, error
 	err := query.Skip(filter.Skip()).Limit(filter.PerPage).Iter().All(&reply.Items)
 
 	if err != nil {
-		return nil, errors.Wraps(err, 500)
+		return nil, errors.Wraps(err, http.StatusInternalServerError)
 	}
 
 	return reply, nil
@@ -88,7 +89,7 @@ func (m *MongoDB) FindOneItemSchema(filter *db.Filter) (*schemas.ItemSchema, err
 	if err == mgo.ErrNotFound {
 		return nil, db.ItemSchemaNotFound
 	} else if err != nil {
-		return nil, errors.Wraps(err, 500)
+		return nil, errors.Wraps(err, http.StatusInternalServerError)
 	}
 
 	return itemSchema, nil
@@ -104,7 +105,7 @@ func (m *MongoDB) FindItemSchemaByCollectionName(collectionName string) (*schema
 	if err == mgo.ErrNotFound {
 		return nil, db.ItemSchemaNotFound
 	} else if err != nil {
-		return nil, errors.Wraps(err, 500)
+		return nil, errors.Wraps(err, http.StatusInternalServerError)
 	}
 
 	return itemSchema, nil
@@ -118,7 +119,7 @@ func (m *MongoDB) DeleteItemSchemaByCollectionName(collectionName string) errors
 	if err == mgo.ErrNotFound {
 		return db.ItemSchemaNotFound
 	} else if err != nil {
-		return errors.Wraps(err, 500)
+		return errors.Wraps(err, http.StatusInternalServerError)
 	}
 	return nil
 }
@@ -158,7 +159,7 @@ func convertMongoError(err error) errors.Error {
 			return buildMongoDuplicatedError()
 		}
 	}
-	return errors.Wraps(err, 500)
+	return errors.Wraps(err, http.StatusInternalServerError)
 }
 
 func buildMongoDuplicatedError() errors.Error {

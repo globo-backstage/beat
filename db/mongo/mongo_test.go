@@ -7,6 +7,7 @@ import (
 	simplejson "github.com/bitly/go-simplejson"
 	"gopkg.in/check.v1"
 	"gopkg.in/mgo.v2/bson"
+	"net/http"
 	"os"
 	"testing"
 )
@@ -127,19 +128,19 @@ func (s *S) TestFindOneItemSchemaWithNotFound(c *check.C) {
 
 	_, dbErr := s.Db.FindOneItemSchema(filter)
 	c.Assert(dbErr, check.NotNil)
-	c.Assert(dbErr.StatusCode(), check.Equals, 404)
+	c.Assert(dbErr.StatusCode(), check.Equals, http.StatusNotFound)
 }
 
 func (s *S) TestFindItemSchemaByCollectionNameWithNotFound(c *check.C) {
 	_, dbErr := s.Db.FindItemSchemaByCollectionName("not-found")
 	c.Assert(dbErr, check.NotNil)
-	c.Assert(dbErr.StatusCode(), check.Equals, 404)
+	c.Assert(dbErr.StatusCode(), check.Equals, http.StatusNotFound)
 }
 
 func (s *S) TestDeleteItemSchemaByCollectionNameWithNotFound(c *check.C) {
 	dbErr := s.Db.DeleteItemSchemaByCollectionName("not-found")
 	c.Assert(dbErr, check.NotNil)
-	c.Assert(dbErr.StatusCode(), check.Equals, 404)
+	c.Assert(dbErr.StatusCode(), check.Equals, http.StatusNotFound)
 }
 
 func (s *S) TestDeleteItemSchemaByCollectionName(c *check.C) {
@@ -151,7 +152,7 @@ func (s *S) TestDeleteItemSchemaByCollectionName(c *check.C) {
 
 	_, dbErr = s.Db.FindItemSchemaByCollectionName("to-be-deleted")
 	c.Assert(dbErr, check.NotNil)
-	c.Assert(dbErr.StatusCode(), check.Equals, 404)
+	c.Assert(dbErr.StatusCode(), check.Equals, http.StatusNotFound)
 }
 
 func (s *S) TestMongoBuildWhereSimple(c *check.C) {
