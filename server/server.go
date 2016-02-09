@@ -68,11 +68,11 @@ func (s *Server) initRoutes() {
 
 	s.router.GET("/api/collection-schemas/:collectionName", transaction.Handle(s.findCollectionSchemaByCollectionName))
 
-	s.router.POST("/api/:collectionName", transaction.Handle(s.createResource))
-	s.router.GET("/api/:collectionName", s.findResource)
-	s.router.GET("/api/:collectionName/findOne", s.findOneResource)
-	s.router.GET("/api/:collectionName/:resourceId", s.findResourceById)
-	s.router.DELETE("/api/:collectionName/:resourceId", s.deleteResourceById)
+	s.router.POST("/api/:collectionName", s.collectionHandle(s.createResource))
+	s.router.GET("/api/:collectionName", s.collectionHandle(s.findResource))
+	s.router.GET("/api/:collectionName/findOne", s.collectionHandle(s.findOneResource))
+	s.router.GET("/api/:collectionName/:resourceId", s.collectionHandle(s.findResourceById))
+	s.router.DELETE("/api/:collectionName/:resourceId", s.collectionHandle(s.deleteResourceById))
 }
 
 func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request, _ map[string]string) {

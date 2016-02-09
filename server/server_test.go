@@ -5,6 +5,8 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/backstage/beat/auth"
 	"github.com/backstage/beat/db"
+	"github.com/backstage/beat/mocks/mock_db"
+	"github.com/golang/mock/gomock"
 	"gopkg.in/check.v1"
 	"io/ioutil"
 	"log"
@@ -20,7 +22,9 @@ import (
 var _ = check.Suite(&S{})
 
 type S struct {
-	server *Server
+	server   *Server
+	db       *mock_db.MockDatabase
+	mockCtrl *gomock.Controller
 }
 
 func Test(t *testing.T) {
@@ -28,8 +32,17 @@ func Test(t *testing.T) {
 }
 
 func (s *S) SetUpSuite(c *check.C) {
-	s.server = New(nil, nil)
 	logrus.SetOutput(ioutil.Discard)
+}
+
+func (s *S) SetUpTest(c *check.C) {
+	s.mockCtrl = gomock.NewController(c)
+	s.db = mock_db.NewMockDatabase(s.mockCtrl)
+	s.server = New(nil, s.db)
+}
+
+func (s *S) TearDownTest(c *check.C) {
+	s.mockCtrl.Finish()
 }
 
 func (s *S) TestNewWithConfigurableSettingsWithInvalidDatabase(c *check.C) {

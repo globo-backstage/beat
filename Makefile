@@ -27,3 +27,7 @@ setup-docs:
 .PHONY: deploy-docs
 deploy-docs:
 	mkdocs gh-deploy --clean
+
+.PHONY: update-mocks
+update-mocks:
+	mockgen -destination "mocks/mock_db/mock_db.go" github.com/backstage/beat/db Database

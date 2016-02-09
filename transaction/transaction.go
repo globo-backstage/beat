@@ -6,6 +6,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/backstage/beat/errors"
+	"github.com/backstage/beat/schemas"
 	"github.com/dimfeld/httptreemux"
 	"github.com/satori/go.uuid"
 	"net/http"
@@ -20,12 +21,14 @@ const (
 
 type TransactionHandler func(*Transaction)
 type Transaction struct {
-	writer     http.ResponseWriter
-	statusCode int
-	Id         string
-	Params     map[string]string
-	Req        *http.Request
-	Log        *log.Entry
+	writer         http.ResponseWriter
+	statusCode     int
+	Id             string
+	CollectionName string
+	ItemSchema     *schemas.ItemSchema
+	Params         map[string]string
+	Req            *http.Request
+	Log            *log.Entry
 }
 
 func (t *Transaction) WriteError(err errors.Error) {
@@ -75,6 +78,29 @@ func Handle(handler TransactionHandler) httptreemux.HandlerFunc {
 			Params: ps,
 			Log: log.WithFields(log.Fields{
 				"transaction": id,
+			}),
+		}
+
+		handler(t)
+		logTransaction(t, time.Since(start))
+	}
+}
+
+func CollectionHandle(handler TransactionHandler) httptreemux.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+		start := time.Now()
+		collectionName := ps["collectionName"]
+		id := IdFromRequest(r)
+
+		t := &Transaction{
+			Id:             id,
+			CollectionName: collectionName,
+			Req:            r,
+			writer:         w,
+			Params:         ps,
+			Log: log.WithFields(log.Fields{
+				"transaction":    id,
+				"collectionName": collectionName,
 			}),
 		}
 
