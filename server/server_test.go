@@ -2,11 +2,19 @@ package server
 
 import (
 	"fmt"
+	"github.com/Sirupsen/logrus"
+	"github.com/backstage/beat/auth"
+	"github.com/backstage/beat/db"
 	"gopkg.in/check.v1"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
+
+	_ "github.com/backstage/beat/auth/static"
+	_ "github.com/backstage/beat/db/mongo"
 )
 
 var _ = check.Suite(&S{})
@@ -21,6 +29,25 @@ func Test(t *testing.T) {
 
 func (s *S) SetUpSuite(c *check.C) {
 	s.server = New(nil, nil)
+	logrus.SetOutput(ioutil.Discard)
+}
+
+func (s *S) TestNewWithConfigurableSettingsWithInvalidDatabase(c *check.C) {
+	os.Setenv("DATABASE", "not-found")
+	os.Setenv("AUTHENTICATION", "static")
+
+	server, err := NewWithConfigurableSettings()
+	c.Assert(server, check.IsNil)
+	c.Assert(err, check.FitsTypeOf, db.ErrNotFound{})
+}
+
+func (s *S) TestNewWithConfigurableSettingsWithInvalidAuthentication(c *check.C) {
+	os.Setenv("DATABASE", "mongo")
+	os.Setenv("AUTHENTICATION", "not-found")
+
+	server, err := NewWithConfigurableSettings()
+	c.Assert(server, check.IsNil)
+	c.Assert(err, check.FitsTypeOf, auth.ErrNotFound{})
 }
 
 func (s *S) TestHealthcheckInRootPath(c *check.C) {

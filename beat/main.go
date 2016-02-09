@@ -2,12 +2,14 @@ package main
 
 import (
 	"flag"
-	"log"
+	log "github.com/Sirupsen/logrus"
 
-	"github.com/backstage/beat/auth"
 	"github.com/backstage/beat/config"
-	"github.com/backstage/beat/db/mongo"
 	"github.com/backstage/beat/server"
+
+	_ "github.com/backstage/beat/auth/static"
+	_ "github.com/backstage/beat/db/mongo"
+	_ "github.com/backstage/beat/db/redis"
 )
 
 func main() {
@@ -22,13 +24,10 @@ func main() {
 	}
 
 	config.LoadLogSettings()
-	authentication := auth.NewFileAuthentication()
-	db, err := mongo.New()
 
+	s, err := server.NewWithConfigurableSettings()
 	if err != nil {
-		log.Fatalf("[mongodb] %s", err)
+		log.Fatal(err.Error())
 	}
-
-	s := server.New(authentication, db)
 	s.Run()
 }

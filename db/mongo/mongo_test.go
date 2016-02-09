@@ -52,6 +52,12 @@ func (s *S) TestNewMongoDBConfigWithDefaultVariables(c *check.C) {
 	c.Assert(s.Db.dialInfo.Database, check.Equals, "backstage_beat_test")
 }
 
+func (s *S) TestGetFromRegister(c *check.C) {
+	db, err := db.New("mongo")
+	c.Assert(err, check.IsNil)
+	c.Assert(db, check.FitsTypeOf, &MongoDB{})
+}
+
 func (s *S) TestCreateItemSchema(c *check.C) {
 	itemSchema := &schemas.ItemSchema{CollectionName: "test-schema"}
 	dbErr := s.Db.CreateItemSchema(itemSchema)

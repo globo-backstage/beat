@@ -1,12 +1,19 @@
 package db
 
 import (
+	"fmt"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
+	"net/http"
 )
 
-var ItemSchemaNotFound = errors.New("item-schema not found", 404)
-var CollectionSchemaNotFound = errors.New("collection-schema not found", 404)
+var (
+	ItemSchemaNotFound       = errors.New("item-schema not found", http.StatusNotFound)
+	CollectionSchemaNotFound = errors.New("collection-schema not found", http.StatusNotFound)
+	databases                = map[string]RegisterFunc{}
+)
+
+type RegisterFunc func() (Database, error)
 
 type Database interface {
 	CreateItemSchema(*schemas.ItemSchema) errors.Error
@@ -18,4 +25,43 @@ type Database interface {
 
 type ItemSchemasReply struct {
 	Items []*schemas.ItemSchema `json:"items"`
+}
+
+// Register inserts a implementation of `Database` in the register, is useful
+// to auto discover implementations and change it without changing the code.
+func Register(name string, fn RegisterFunc) {
+	databases[name] = fn
+}
+
+// New returns a implementation of `Database` found in the register, if not found
+// return an error.
+func New(name string) (Database, error) {
+	fn := databases[name]
+	if fn == nil {
+		return nil, ErrNotFound{name: name}
+	}
+	db, err := fn()
+
+	if err != nil {
+		return nil, databaseError{name: name, originalErr: err}
+	}
+
+	return db, nil
+}
+
+type ErrNotFound struct {
+	name string
+}
+
+func (d ErrNotFound) Error() string {
+	return fmt.Sprintf(`Database "%s" not found`, d.name)
+}
+
+type databaseError struct {
+	name        string
+	originalErr error
+}
+
+func (d databaseError) Error() string {
+	return fmt.Sprintf(`[db][%s] %s`, d.name, d.originalErr.Error())
 }

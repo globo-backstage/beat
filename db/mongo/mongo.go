@@ -14,6 +14,10 @@ import (
 func init() {
 	viper.SetDefault("mongo.uri", "localhost:27017/backstage_beat_local")
 	viper.SetDefault("mongo.failFast", true)
+
+	db.Register("mongo", func() (db.Database, error) {
+		return New()
+	})
 }
 
 type MongoDB struct {

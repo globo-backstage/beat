@@ -1,9 +1,11 @@
 package transaction
 
 import (
+	"github.com/Sirupsen/logrus"
 	"github.com/backstage/beat/errors"
 	simplejson "github.com/bitly/go-simplejson"
 	"gopkg.in/check.v1"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -19,6 +21,10 @@ type S struct {
 
 func Test(t *testing.T) {
 	check.TestingT(t)
+}
+
+func (s *S) SetUpSuite(c *check.C) {
+	logrus.SetOutput(ioutil.Discard)
 }
 
 func (s *S) SetUpTest(c *check.C) {

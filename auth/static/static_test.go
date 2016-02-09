@@ -1,6 +1,7 @@
-package auth
+package static
 
 import (
+	"github.com/backstage/beat/auth"
 	"github.com/backstage/beat/config"
 	"gopkg.in/check.v1"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 var _ = check.Suite(&S{})
 
 type S struct {
-	authenticaton *FileAuthentication
+	authenticaton *StaticAuthentication
 }
 
 func Test(t *testing.T) {
@@ -18,13 +19,19 @@ func Test(t *testing.T) {
 }
 
 func (s *S) SetUpSuite(c *check.C) {
-	err := config.ReadConfigFile("../examples/config.yml")
+	err := config.ReadConfigFile("../../examples/config.yml")
 	c.Assert(err, check.IsNil)
 
-	s.authenticaton = NewFileAuthentication()
+	s.authenticaton = NewStaticAuthentication()
 }
 
-func (s *S) TestFileAuthenticationWithUserFound(c *check.C) {
+func (s *S) TestGetFromRegister(c *check.C) {
+	db, err := auth.New("static")
+	c.Assert(err, check.IsNil)
+	c.Assert(db, check.FitsTypeOf, &StaticAuthentication{})
+}
+
+func (s *S) TestStaticAuthenticationWithUserFound(c *check.C) {
 	header := &http.Header{}
 	header.Set("Token", "example1")
 
@@ -40,7 +47,7 @@ func (s *S) TestFileAuthenticationWithUserFound(c *check.C) {
 	c.Assert(user.Email(), check.Equals, "guest@example.net")
 }
 
-func (s *S) TestFileAuthenticationWithUserNotFound(c *check.C) {
+func (s *S) TestStaticAuthenticationWithUserNotFound(c *check.C) {
 	header := &http.Header{}
 	header.Set("Token", "not-found")
 
@@ -48,7 +55,7 @@ func (s *S) TestFileAuthenticationWithUserNotFound(c *check.C) {
 	c.Assert(user, check.IsNil)
 }
 
-func (s *S) TestFileAuthenticationWithMissingToken(c *check.C) {
+func (s *S) TestStaticAuthenticationWithMissingToken(c *check.C) {
 	header := &http.Header{}
 	user := s.authenticaton.GetUser(header)
 	c.Assert(user, check.IsNil)

@@ -1,13 +1,13 @@
-package auth
+package static
 
 import (
 	"fmt"
-	_ "github.com/backstage/beat/config"
+	"github.com/backstage/beat/auth"
 	"github.com/spf13/viper"
 	"net/http"
 )
 
-// FileAuthentication implements the auth.Authable interface.
+// StaticAuthentication implements the auth.Authable interface.
 //
 // This Authable is a simple authentication based on a yaml file
 // that contains all tokens allowed to perform a write operation.
@@ -25,26 +25,32 @@ import (
 // For each token is allowed to make a request like
 // curl -H "Token: example1" http://myserver/api/collection
 
-type FileAuthentication struct{}
+type StaticAuthentication struct{}
 
-// FileUser implements the auth.User interface.
-type FileUser struct {
+// StaticUser implements the auth.User interface.
+type StaticUser struct {
 	TokenEmail string `mapstructure:"email"`
 }
 
 var (
 	TokensConfigPath = "auth.tokens"
-	NilFileUser      = FileUser{}
+	NilStaticUser    = StaticUser{}
 )
 
-// NewFileAuthentication return a new FileAuthentication
-func NewFileAuthentication() *FileAuthentication {
-	return &FileAuthentication{}
+func init() {
+	auth.Register("static", func() (auth.Authable, error) {
+		return NewStaticAuthentication(), nil
+	})
+}
+
+// NewStaticAuthentication return a new StaticAuthentication
+func NewStaticAuthentication() *StaticAuthentication {
+	return &StaticAuthentication{}
 }
 
 // GetUser implements auth.Authable interface.
-func (authenticaton *FileAuthentication) GetUser(header *http.Header) User {
-	var user FileUser
+func (authenticaton *StaticAuthentication) GetUser(header *http.Header) auth.User {
+	var user StaticUser
 	token := header.Get("Token")
 
 	if token == "" {
@@ -53,7 +59,7 @@ func (authenticaton *FileAuthentication) GetUser(header *http.Header) User {
 
 	viper.UnmarshalKey(fmt.Sprintf("%s.%s", TokensConfigPath, token), &user)
 
-	if user == NilFileUser {
+	if user == NilStaticUser {
 		return nil
 	}
 
@@ -61,6 +67,6 @@ func (authenticaton *FileAuthentication) GetUser(header *http.Header) User {
 }
 
 // Email implements auth.User interface.
-func (user FileUser) Email() string {
+func (user StaticUser) Email() string {
 	return user.TokenEmail
 }

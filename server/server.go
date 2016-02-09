@@ -20,6 +20,8 @@ type Server struct {
 func init() {
 	viper.SetDefault("host", "0.0.0.0")
 	viper.SetDefault("port", 3000)
+	viper.SetDefault("database", "mongo")
+	viper.SetDefault("authentication", "static")
 }
 
 func New(authentication auth.Authable, db db.Database) *Server {
@@ -29,6 +31,22 @@ func New(authentication auth.Authable, db db.Database) *Server {
 	}
 	server.initRoutes()
 	return server
+}
+
+func NewWithConfigurableSettings() (*Server, error) {
+	db, err := db.New(viper.GetString("database"))
+
+	if err != nil {
+		return nil, err
+	}
+
+	auth, err := auth.New(viper.GetString("authentication"))
+
+	if err != nil {
+		return nil, err
+	}
+
+	return New(auth, db), nil
 }
 
 func (s *Server) Run() {

@@ -31,6 +31,10 @@ func init() {
 	viper.SetDefault("redis.pool.maxActive", 10)
 	viper.SetDefault("redis.pool.wait", true)
 	viper.SetDefault("redis.pool.idleTimeout", 180e9)
+
+	db.Register("redis", func() (db.Database, error) {
+		return New()
+	})
 }
 
 func New() (*Redis, error) {

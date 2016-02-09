@@ -9,6 +9,8 @@ Backstage Beat is very configurable, all configurations are available below.
 | log.level     | LOG_LEVEL           | info           | Application log level, are available: debug, info, warn, error, fatal and panic. |
 | host          | HOST                | 0.0.0.0        | Host to serve API. |
 | port          | PORT                | 3000           | Port to serve API. |
+| database      | DATABASE            | mongo          | Database engine to use, are currently available: `mongo` and `redis` . |
+| authentication| AUTHENTICATION      | static         | Authentication engine to use, is currently available: `static` . |
 
 
 ## Database Engines
