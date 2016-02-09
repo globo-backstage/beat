@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 var (
@@ -52,7 +53,12 @@ type ErrNotFound struct {
 }
 
 func (a ErrNotFound) Error() string {
-	return fmt.Sprintf(`Authentication "%s" not found`, a.name)
+	availableAuths := make([]string, 0, len(auths))
+	for auth := range auths {
+		availableAuths = append(availableAuths, auth)
+	}
+
+	return fmt.Sprintf(`Authentication "%s" not found, are available: %s.`, a.name, strings.Join(availableAuths, ", "))
 }
 
 type authError struct {

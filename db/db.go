@@ -5,6 +5,7 @@ import (
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
 	"net/http"
+	"strings"
 )
 
 var (
@@ -54,7 +55,12 @@ type ErrNotFound struct {
 }
 
 func (d ErrNotFound) Error() string {
-	return fmt.Sprintf(`Database "%s" not found`, d.name)
+	availableDatabases := make([]string, 0, len(databases))
+	for db := range databases {
+		availableDatabases = append(availableDatabases, db)
+	}
+
+	return fmt.Sprintf(`Database "%s" not found, are available: %s.`, d.name, strings.Join(availableDatabases, ", "))
 }
 
 type databaseError struct {
