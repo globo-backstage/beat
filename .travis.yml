@@ -17,7 +17,7 @@ install:
 
 script:
   - cd $HOME/gopath/src/github.com/backstage/beat
-  - go test -x ./...
+  - go test -v ./...
 
 notifications:
   email:
