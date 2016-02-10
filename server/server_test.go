@@ -22,9 +22,8 @@ import (
 var _ = check.Suite(&S{})
 
 type S struct {
-	server   *Server
-	db       *mock_db.MockDatabase
-	mockCtrl *gomock.Controller
+	server *Server
+	db     *mock_db.MockDatabase
 }
 
 func Test(t *testing.T) {
@@ -36,13 +35,7 @@ func (s *S) SetUpSuite(c *check.C) {
 }
 
 func (s *S) SetUpTest(c *check.C) {
-	s.mockCtrl = gomock.NewController(c)
-	s.db = mock_db.NewMockDatabase(s.mockCtrl)
-	s.server = New(nil, s.db)
-}
-
-func (s *S) TearDownTest(c *check.C) {
-	s.mockCtrl.Finish()
+	s.server = New(nil, nil)
 }
 
 func (s *S) TestNewWithConfigurableSettingsWithInvalidDatabase(c *check.C) {
@@ -87,4 +80,12 @@ func (s *S) Request(r *http.Request) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
 	s.server.router.ServeHTTP(w, r)
 	return w
+}
+
+func (s *S) mockDatabase(c *check.C) *gomock.Controller {
+	mockCtrl := gomock.NewController(c)
+	s.db = mock_db.NewMockDatabase(mockCtrl)
+	s.server = New(nil, s.db)
+
+	return mockCtrl
 }

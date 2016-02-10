@@ -10,15 +10,18 @@ import (
 )
 
 func (s *S) TestCreateResourceWithNotSupportedRoot(c *check.C) {
-	itemSchema := &schemas.ItemSchema{CollectionName: "photos"}
-	s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(itemSchema, nil)
+	mockCtrl := s.mockDatabase(c)
+	defer mockCtrl.Finish()
 
+	itemSchema := &schemas.ItemSchema{CollectionName: "photos"}
 	bufs := []string{
 		`[{"name": "fail"}]`,
 		`"not-valid"`,
 		`10`,
 	}
 	for _, buf := range bufs {
+		s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(itemSchema, nil)
+
 		r, _ := http.NewRequest("POST", "/api/photos", bytes.NewBufferString(buf))
 		response := s.Request(r)
 		c.Assert(response.Code, check.Equals, http.StatusBadRequest)
@@ -32,14 +35,17 @@ func (s *S) TestCreateResourceWithNotSupportedRoot(c *check.C) {
 }
 
 func (s *S) TestCreateResourceWithInvalidJson(c *check.C) {
-	itemSchema := &schemas.ItemSchema{CollectionName: "photos"}
-	s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(itemSchema, nil)
+	mockCtrl := s.mockDatabase(c)
+	defer mockCtrl.Finish()
 
+	itemSchema := &schemas.ItemSchema{CollectionName: "photos"}
 	bufs := []string{
 		`["name"}`,
 		`{1"adf"`,
 	}
 	for _, buf := range bufs {
+		s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(itemSchema, nil)
+
 		r, _ := http.NewRequest("POST", "/api/photos", bytes.NewBufferString(buf))
 		response := s.Request(r)
 		c.Assert(response.Code, check.Equals, http.StatusBadRequest)
@@ -53,6 +59,9 @@ func (s *S) TestCreateResourceWithInvalidJson(c *check.C) {
 }
 
 func (s *S) TestCreateResourceWithoutBody(c *check.C) {
+	mockCtrl := s.mockDatabase(c)
+	defer mockCtrl.Finish()
+
 	itemSchema := &schemas.ItemSchema{CollectionName: "photos"}
 	s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(itemSchema, nil)
 
@@ -68,6 +77,9 @@ func (s *S) TestCreateResourceWithoutBody(c *check.C) {
 }
 
 func (s *S) TestCreateResource(c *check.C) {
+	mockCtrl := s.mockDatabase(c)
+	defer mockCtrl.Finish()
+
 	itemSchema := &schemas.ItemSchema{CollectionName: "photos"}
 	s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(itemSchema, nil)
 
@@ -83,6 +95,9 @@ func (s *S) TestCreateResource(c *check.C) {
 }
 
 func (s *S) TestCreateResourceWhenItemSchemaNotIsFound(c *check.C) {
+	mockCtrl := s.mockDatabase(c)
+	defer mockCtrl.Finish()
+
 	s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(nil, db.ItemSchemaNotFound)
 
 	buf := bytes.NewBufferString(`{"name": "ok"}`)
