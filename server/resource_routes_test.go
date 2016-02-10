@@ -10,6 +10,9 @@ import (
 )
 
 func (s *S) TestCreateResourceWithNotSupportedRoot(c *check.C) {
+	itemSchema := &schemas.ItemSchema{CollectionName: "photos"}
+	s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(itemSchema, nil)
+
 	bufs := []string{
 		`[{"name": "fail"}]`,
 		`"not-valid"`,
@@ -29,6 +32,9 @@ func (s *S) TestCreateResourceWithNotSupportedRoot(c *check.C) {
 }
 
 func (s *S) TestCreateResourceWithInvalidJson(c *check.C) {
+	itemSchema := &schemas.ItemSchema{CollectionName: "photos"}
+	s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(itemSchema, nil)
+
 	bufs := []string{
 		`["name"}`,
 		`{1"adf"`,
@@ -47,6 +53,9 @@ func (s *S) TestCreateResourceWithInvalidJson(c *check.C) {
 }
 
 func (s *S) TestCreateResourceWithoutBody(c *check.C) {
+	itemSchema := &schemas.ItemSchema{CollectionName: "photos"}
+	s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(itemSchema, nil)
+
 	r, _ := http.NewRequest("POST", "/api/photos", bytes.NewBufferString(""))
 	response := s.Request(r)
 	c.Assert(response.Code, check.Equals, http.StatusBadRequest)
@@ -60,7 +69,6 @@ func (s *S) TestCreateResourceWithoutBody(c *check.C) {
 
 func (s *S) TestCreateResource(c *check.C) {
 	itemSchema := &schemas.ItemSchema{CollectionName: "photos"}
-
 	s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(itemSchema, nil)
 
 	buf := bytes.NewBufferString(`{"name": "ok"}`)
