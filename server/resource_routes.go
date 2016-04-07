@@ -6,6 +6,7 @@ import (
 	"github.com/backstage/beat/transaction"
 	"github.com/dimfeld/httptreemux"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -50,7 +51,14 @@ func (s *Server) createResource(t *transaction.Transaction) {
 }
 
 func (s *Server) findResource(t *transaction.Transaction) {
-	t.WriteError(errors.New("TODO: Find resource", http.StatusNotImplemented))
+	result, err := s.DB.FindCollectionSchema(t.ItemSchema.CollectionName, nil)
+	if err != nil {
+		println("error trying to recover")
+		log.Println(err)
+		return
+	}
+	println("returning result", result)
+	t.WriteResult(result)
 }
 
 func (s *Server) findOneResource(t *transaction.Transaction) {

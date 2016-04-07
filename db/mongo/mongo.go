@@ -139,6 +139,27 @@ func (m *MongoDB) DeleteItemSchemaByCollectionName(collectionName string) errors
 	return nil
 }
 
+// TODO: change to FindResources
+func (m *MongoDB) FindCollectionSchema(collectionName string, filter *db.Filter) (*db.ResourceReply, errors.Error) {
+	session := m.session.Clone()
+	defer session.Close()
+	query := session.DB("").C(collectionName).Find(nil)
+
+	reply := &db.ResourceReply{}
+	reply.Items = []*schemas.Resources{}
+
+	println("===============")
+	println("Geting from: ", collectionName)
+	println("===============")
+	err := query.Limit(10).Iter().All(&reply.Items)
+
+	if err != nil {
+		return nil, errors.Wraps(err, http.StatusInternalServerError)
+	}
+
+	return reply, nil
+}
+
 func BuildMongoWhere(where *simplejson.Json, primaryKey string) bson.M {
 	mongoWhere := bson.M{}
 	for key, value := range where.MustMap() {

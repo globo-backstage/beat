@@ -23,8 +23,12 @@ type Database interface {
 	FindOneItemSchema(*Filter) (*schemas.ItemSchema, errors.Error)
 	FindItemSchemaByCollectionName(string) (*schemas.ItemSchema, errors.Error)
 	DeleteItemSchemaByCollectionName(string) errors.Error
-
 	CreateResource(string, *schemas.CollectionSchema) errors.Error
+	FindCollectionSchema(string, *Filter) (*ResourceReply, errors.Error)
+}
+
+type ResourceReply struct {
+	Items []*schemas.Resources `json:"items"`
 }
 
 type ItemSchemasReply struct {
