@@ -1,10 +1,16 @@
 package schemas
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/backstage/beat/errors"
+	"io"
+	"net/http"
+)
 
 type CollectionSchema struct {
-	Schema         string   `json:"$schema"`
-	CollectionName string   `json:"collectionName"`
+	Schema         string   `json:"$schema" bson:"%20schema"`
+	CollectionName string   `json:"collectionName" bson:"_id"`
 	Type           string   `json:"type"`
 	Title          string   `json:"title,omitempty"`
 	Properties     colProps `json:"properties"`
@@ -29,6 +35,17 @@ func NewCollectionSchema(itemSchema *ItemSchema) *CollectionSchema {
 	}
 
 	return collectionSchema
+}
+
+// NewItemSchemaFromReader return a new ItemSchema by an io.Reader.
+// return a error if the buffer not is valid.
+func NewCollectionSchemaFromReader(r io.Reader) (*CollectionSchema, errors.Error) {
+	collectionSchema := &CollectionSchema{}
+	err := json.NewDecoder(r).Decode(collectionSchema)
+	if err != nil {
+		return nil, errors.Wraps(err, http.StatusBadRequest)
+	}
+	return collectionSchema, nil
 }
 
 func (schema *CollectionSchema) ApplyBaseUrl(baseUrl string) {
