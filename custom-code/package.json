@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/backstage/beat/issues"
   },
-  "homepage": "https://github.com/backstage/beat#readme"
+  "homepage": "https://github.com/backstage/beat#readme",
+  "dependencies": {
+    "async": "^2.0.0-rc.2",
+    "request": "^2.70.0"
+  }
 }
