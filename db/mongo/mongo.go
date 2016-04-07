@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"fmt"
 	_ "github.com/backstage/beat/config"
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
@@ -57,6 +58,20 @@ func (m *MongoDB) CreateItemSchema(itemSchema *schemas.ItemSchema) errors.Error 
 		return convertMongoError(err)
 	}
 
+	return nil
+}
+
+func (m *MongoDB) CreateResource(collectionName string, item *schemas.CollectionSchema) errors.Error {
+	session := m.session.Clone()
+	defer session.Close()
+	// item.Set("_id", collectionName)
+	// item.Del("collectionName")
+	// bs = bson.M(item)
+
+	fmt.Println(item)
+	if err := session.DB("").C(collectionName).Insert(item); err != nil {
+		return convertMongoError(err)
+	}
 	return nil
 }
 

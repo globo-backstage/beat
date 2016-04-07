@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
+	// simplejson "github.com/bitly/go-simplejson"
 	"net/http"
 	"strings"
 )
@@ -22,6 +23,8 @@ type Database interface {
 	FindOneItemSchema(*Filter) (*schemas.ItemSchema, errors.Error)
 	FindItemSchemaByCollectionName(string) (*schemas.ItemSchema, errors.Error)
 	DeleteItemSchemaByCollectionName(string) errors.Error
+
+	CreateResource(string, *schemas.CollectionSchema) errors.Error
 }
 
 type ItemSchemasReply struct {
