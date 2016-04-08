@@ -84,7 +84,7 @@ func (r *Redis) FindOneItemSchema(*db.Filter) (*schemas.ItemSchema, errors.Error
 	return nil, ErrNotImplemented
 }
 
-func (r *Redis) FindCollectionSchema(string, *db.Filter) (*db.ResourceReply, errors.Error) {
+func (r *Redis) FindResources(string, *db.Filter) (*db.ResourceReply, errors.Error) {
 	return nil, ErrNotImplemented
 }
 

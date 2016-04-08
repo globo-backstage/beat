@@ -1,12 +1,12 @@
 package server
 
 import (
+	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
 	"github.com/backstage/beat/transaction"
 	"github.com/dimfeld/httptreemux"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -51,13 +51,12 @@ func (s *Server) createResource(t *transaction.Transaction) {
 }
 
 func (s *Server) findResource(t *transaction.Transaction) {
-	result, err := s.DB.FindCollectionSchema(t.ItemSchema.CollectionName, nil)
+	filter, err := db.NewFilterFromQueryString(t.Req.URL.RawQuery)
+	result, err := s.DB.FindResources(t.ItemSchema.CollectionName, filter)
 	if err != nil {
-		println("error trying to recover")
-		log.Println(err)
+		t.WriteError(errors.New("Error feching from database", http.StatusInternalServerError))
 		return
 	}
-	println("returning result", result)
 	t.WriteResult(result)
 }
 

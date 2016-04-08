@@ -139,24 +139,20 @@ func (m *MongoDB) DeleteItemSchemaByCollectionName(collectionName string) errors
 	return nil
 }
 
-// TODO: change to FindResources
-func (m *MongoDB) FindCollectionSchema(collectionName string, filter *db.Filter) (*db.ResourceReply, errors.Error) {
+func (m *MongoDB) FindResources(collectionName string, filter *db.Filter) (*db.ResourceReply, errors.Error) {
 	session := m.session.Clone()
 	defer session.Close()
 	query := session.DB("").C(collectionName).Find(nil)
-
 	reply := &db.ResourceReply{}
-	reply.Items = []*schemas.Resources{}
-
-	println("===============")
-	println("Geting from: ", collectionName)
-	println("===============")
-	err := query.Limit(10).Iter().All(&reply.Items)
-
+	reply.Items = []schemas.Resource{}
+	err := query.Skip(filter.Skip()).Limit(filter.PerPage).Iter().All(&reply.Items)
 	if err != nil {
 		return nil, errors.Wraps(err, http.StatusInternalServerError)
 	}
-
+	for _, item := range reply.Items {
+		item["id"] = item["_id"]
+		delete(item, "_id")
+	}
 	return reply, nil
 }
 

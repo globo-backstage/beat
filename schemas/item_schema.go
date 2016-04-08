@@ -38,10 +38,6 @@ type ItemSchema struct {
 	CollectionLinks      *Links     `json:"collectionLinks,omitempty"`
 }
 
-type Resources struct {
-	Name string `json:"name" bson:"name"`
-}
-
 // NewItemSchemaFromReader return a new ItemSchema by an io.Reader.
 // return a error if the buffer not is valid.
 func NewItemSchemaFromReader(r io.Reader) (*ItemSchema, errors.Error) {
