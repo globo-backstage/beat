@@ -3,8 +3,8 @@ package server
 import (
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
-	"github.com/backstage/beat/schemas"
 	"github.com/backstage/beat/transaction"
+	simplejson "github.com/bitly/go-simplejson"
 	"github.com/dimfeld/httptreemux"
 	"io"
 	"net/http"
@@ -30,7 +30,7 @@ func (s *Server) collectionHandle(handler transaction.TransactionHandler) httptr
 }
 
 func (s *Server) createResource(t *transaction.Transaction) {
-	resource, err := schemas.NewCollectionSchemaFromReader(t.Req.Body)
+	resource, err := simplejson.NewFromReader(t.Req.Body)
 
 	if err == io.EOF {
 		t.WriteError(ErrEmptyResource)
@@ -40,10 +40,10 @@ func (s *Server) createResource(t *transaction.Transaction) {
 		return
 	}
 
-	// if _, err = resource.Map(); err != nil {
-	// 	t.WriteError(ErrResourceNotAnObject)
-	// 	return
-	// }
+	if _, err = resource.Map(); err != nil {
+		t.WriteError(ErrResourceNotAnObject)
+		return
+	}
 	if err = s.DB.CreateResource(t.CollectionName, resource); err != nil {
 		t.WriteError(errors.Newf(http.StatusInternalServerError, "Could not save to database", err.Error()))
 	}

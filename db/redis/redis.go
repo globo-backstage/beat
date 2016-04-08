@@ -6,7 +6,7 @@ import (
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
-	// simplejson "github.com/bitly/go-simplejson"
+	simplejson "github.com/bitly/go-simplejson"
 	"github.com/garyburd/redigo/redis"
 	"github.com/spf13/viper"
 	"net/http"
@@ -116,7 +116,7 @@ func (r *Redis) Flush() {
 	redisConn.Close()
 }
 
-func (r *Redis) CreateResource(collectionName string, item *schemas.CollectionSchema) errors.Error {
+func (r *Redis) CreateResource(collectionName string, resource *simplejson.Json) errors.Error {
 	return ErrNotImplemented
 }
 
