@@ -6,6 +6,7 @@ import (
 	"github.com/backstage/beat/transaction"
 	simplejson "github.com/bitly/go-simplejson"
 	"github.com/dimfeld/httptreemux"
+	"github.com/xeipuuv/gojsonschema"
 	"io"
 	"net/http"
 )
@@ -44,8 +45,27 @@ func (s *Server) createResource(t *transaction.Transaction) {
 		t.WriteError(ErrResourceNotAnObject)
 		return
 	}
-	if err = s.DB.CreateResource(t.CollectionName, resource); err != nil {
-		t.WriteError(errors.Newf(http.StatusInternalServerError, "Could not save to database", err.Error()))
+	schemaLoader := gojsonschema.NewGoLoader(t.ItemSchema)
+	resourceLoader := gojsonschema.NewGoLoader(resource.MustMap())
+
+	result, err := gojsonschema.Validate(schemaLoader, resourceLoader)
+	if err != nil {
+		t.WriteError(errors.Wraps(err, http.StatusInternalServerError))
+		return
+	}
+
+	if !result.Valid() {
+		validationError := &errors.ValidationError{}
+		for _, fieldErr := range result.Errors() {
+			validationError.Put(fieldErr.Field(), fieldErr.Description())
+		}
+		t.WriteError(validationError)
+		return
+	}
+
+	if dbErr := s.DB.CreateResource(t.CollectionName, resource); dbErr != nil {
+		t.WriteError(dbErr)
+		return
 	}
 	t.WriteResultWithStatusCode(http.StatusCreated, resource)
 }

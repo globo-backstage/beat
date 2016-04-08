@@ -25,7 +25,7 @@ type Properties map[string]map[string]interface{}
 // This struct is based on json-schema specification,
 // see more in: http://json-schema.org
 type ItemSchema struct {
-	Schema               string     `json:"$schema" bson:"%20schema"`
+	Schema               string     `json:"$schema" bson:"%24schema"`
 	CollectionName       string     `json:"collectionName" bson:"_id"`
 	Title                string     `json:"title,omitempty"`
 	CollectionTitle      string     `json:"collectionTitle,omitempty"`
