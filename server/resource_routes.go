@@ -6,6 +6,7 @@ import (
 	"github.com/backstage/beat/transaction"
 	simplejson "github.com/bitly/go-simplejson"
 	"github.com/dimfeld/httptreemux"
+	"github.com/satori/go.uuid"
 	"github.com/xeipuuv/gojsonschema"
 	"io"
 	"net/http"
@@ -63,8 +64,16 @@ func (s *Server) createResource(t *transaction.Transaction) {
 		return
 	}
 
-	if dbErr := s.DB.CreateResource(t.CollectionName, resource); dbErr != nil {
-		t.WriteError(dbErr)
+	primaryKey := resource.Get("id").MustString()
+	if primaryKey == "" {
+		resource.Set("id", uuid.NewV4().String())
+	}
+	if cErr := transaction.RunBeforeSave(t); cErr != nil {
+		t.WriteError(cErr)
+		return
+	}
+	if cErr := s.DB.CreateResource(t.CollectionName, resource); cErr != nil {
+		t.WriteError(cErr)
 		return
 	}
 	t.WriteResultWithStatusCode(http.StatusCreated, resource)

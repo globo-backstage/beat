@@ -12,7 +12,7 @@ function handler(req, res) {
             return;
         }
 
-        runCustomCodes(body, function(err) {
+        runCustomCodes(body, (err) => {
             if (err) {
                 writeError(err, res);
                 return;
@@ -22,7 +22,6 @@ function handler(req, res) {
                 'Content-Type': 'text/plain'
             });
 
-            console.info('received: ', body);
             res.end('ok');
         });
     });
@@ -36,21 +35,24 @@ function runCustomCodes(body, callback) {
                 return;
             }
             finished = true;
-            next(err);
+            callback(err);
         };
 
-        async.eachSeries(body.customCodes, (customCodeId, callback) => {
+        async.eachSeries(body.customCodes, (customCodeId, customCodeCallback) => {
             if (finished) {
-                return callback(null);
+                customCodeCallback(null);
+                return;
             }
-            runScript(customCodeId, body, callback, finish);
-        }, function done(err) {
+            runScript(customCodeId, body, customCodeCallback, finish);
+        }, (err, blah) => {
+            console.info('blah ...', blah);
             finish(err);
         });
     });
 }
 
 function runScript(customCodeId, body, callback) {
+    console.info('runScript', customCodeId, body);
     var script = registry.getScript(customCodeId);
     var ctx = context.create(
         customCodeId,

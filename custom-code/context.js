@@ -1,4 +1,5 @@
 const vm = require('vm');
+const CustomCodeResponse = require('./response');
 
 
 var sandbox = {
@@ -31,6 +32,9 @@ function create(customCodeId, request, backstageOptions, customCodeCallback) {
         sandbox.Backstage[key] = backstageOptions[key];
     }
 
+    sandbox.Backstage.response = new CustomCodeResponse(customCodeCallback);    
+    // TODO: use safe require package
+    sandbox.require = require;
     sandbox.console = console;
     sandbox.exports = exports;
     sandbox.module = {
