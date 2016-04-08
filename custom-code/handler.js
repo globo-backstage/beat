@@ -1,4 +1,9 @@
-var registry = require('./registry');
+const async = require('async');
+
+const registry = require('./registry');
+const config = require('./config');
+const context = require('./context');
+
 
 function handler(req, res) {
     bufferizeBody(req, (err, body) => {
@@ -7,7 +12,7 @@ function handler(req, res) {
             return;
         }
 
-        registry.populateNewCustomCodes(body.customCodes, function(err) {
+        runCustomCodes(body, function(err) {
             if (err) {
                 writeError(err, res);
                 return;
@@ -21,15 +26,47 @@ function handler(req, res) {
             res.end('ok');
         });
     });
+}
 
+function runCustomCodes(body, callback) {
+    registry.populateNewCustomCodes(body.customCodes, (err) => {
+        var finished = false;
+        var finish = (err) => {
+            if (finished) {
+                return;
+            }
+            finished = true;
+            next(err);
+        };
+
+        async.eachSeries(body.customCodes, (customCodeId, callback) => {
+            if (finished) {
+                return callback(null);
+            }
+            runScript(customCodeId, body, callback, finish);
+        }, function done(err) {
+            finish(err);
+        });
+    });
+}
+
+function runScript(customCodeId, body, callback) {
+    var script = registry.getScript(customCodeId);
+    var ctx = context.create(
+        customCodeId,
+        body.req,
+        {executeHookName: body.hook},
+        callback
+    );
+    script.runInContext(ctx, {timeout: config.syncTimeout});
 }
 
 function bufferizeBody(req, callback) {
     var body = [];
 
-    req.on('data', function(chunk) {
+    req.on('data', (chunk) => {
         body.push(chunk);
-    }).on('end', function() {
+    }).on('end', () =>{
         body = Buffer.concat(body).toString();
         try {
             callback(null, JSON.parse(body));

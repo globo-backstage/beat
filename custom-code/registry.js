@@ -5,9 +5,9 @@ const request = require('request');
 const vm = require('vm');
 
 const context = require('./context');
-const beatHost = process.env['BEAT_HOST'] || 'localhost';
+const config = require('./config');
 
-const customCodePath = `http://${beatHost}/api/custom-codes/`;
+const customCodePath = `http://${config.beatHost}/api/custom-codes/`;
 
 var COMPILE_CUSTOM_CODE_FOOT = (
     'if (Backstage.executeHookName && Backstage.defines[Backstage.executeHookName]) {\n'+
@@ -15,12 +15,6 @@ var COMPILE_CUSTOM_CODE_FOOT = (
     '} else {\n'+
         'Backstage.response.success();\n'+
     '}');
-
-
-const config = {
-    syncTimeout: process.env.CUSTOM_CODE_SYNC_TIMEOUT || 100,
-    asyncTimeout: process.env.CUSTOM_CODE_ASYNC_TIMEOUT || 5000
-};
 
 class Registry {
     constructor() {
@@ -39,6 +33,15 @@ class Registry {
 
     put(customCodeId, customCode) {
         this.codes[customCodeId] = customCode;
+    }
+
+    get(customCodeId) {
+        return this.codes[customCodeId];
+    }
+
+    getScript(customCodeId) {
+        var item = this.get(customCodeId);
+        return item ? item.script : null;
     }
 }
 
