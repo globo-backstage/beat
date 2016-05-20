@@ -9,7 +9,7 @@ const config = require('./config');
 
 const customCodePath = `http://${config.beatHost}/api/custom-codes/`;
 
-var COMPILE_CUSTOM_CODE_FOOT = (
+const COMPILE_CUSTOM_CODE_FOOT = (
     'if (Backstage.executeHookName && Backstage.defines[Backstage.executeHookName]) {\n'+
         'Backstage.defines[Backstage.executeHookName](Backstage.request, Backstage.response);\n'+
     '} else {\n'+
@@ -18,12 +18,12 @@ var COMPILE_CUSTOM_CODE_FOOT = (
 
 class Registry {
     constructor() {
-        this.codes = {};
+        this._codes = {};
     }
 
     populateNewCustomCodes(customCodes, fn) {
         var newCustomCodes = customCodes.filter((customCodeId) => {
-            return this.codes[customCodeId] === undefined;
+            return this._codes[customCodeId] === undefined;
         });
 
         async.filter(newCustomCodes, fetchCustomCode.bind(this), function(err, customCodeIds) {
@@ -32,11 +32,11 @@ class Registry {
     }
 
     put(customCodeId, customCode) {
-        this.codes[customCodeId] = customCode;
+        this._codes[customCodeId] = customCode;
     }
 
     get(customCodeId) {
-        return this.codes[customCodeId];
+        return this._codes[customCodeId];
     }
 
     getScript(customCodeId) {
@@ -46,7 +46,8 @@ class Registry {
 }
 
 function fetchCustomCode(customCodeId, callback) {
-    request({url: `${customCodePath}${customCodeId}`, json: true}, (error, res, body) => {
+    const url = `${customCodePath}${customCodeId}`;
+    request({url, json: true}, (error, res, body) => {
         if (error) {
             callback(error);
             return;

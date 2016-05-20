@@ -17,7 +17,5 @@ if (cluster.isMaster) {
         cluster.fork();
     });
 } else {
-    http.createServer((req, res) => {
-        handler(req, res);
-    }).listen(customCodePort);
+    http.createServer(handler).listen(customCodePort);
 }

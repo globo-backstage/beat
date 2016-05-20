@@ -52,7 +52,6 @@ function runCustomCodes(body, callback) {
 }
 
 function runScript(customCodeId, body, callback) {
-    console.info('runScript', customCodeId, body);
     var script = registry.getScript(customCodeId);
     var ctx = context.create(
         customCodeId,
@@ -66,16 +65,18 @@ function runScript(customCodeId, body, callback) {
 function bufferizeBody(req, callback) {
     var body = [];
 
-    req.on('data', (chunk) => {
-        body.push(chunk);
-    }).on('end', () =>{
-        body = Buffer.concat(body).toString();
-        try {
-            callback(null, JSON.parse(body));
-        } catch(error) {
-            callback(error);
-        }
-    });
+    req
+        .on('data', (chunk) => {
+            body.push(chunk);
+        })
+        .on('end', () =>{
+            body = Buffer.concat(body).toString();
+            try {
+                callback(null, JSON.parse(body));
+            } catch(error) {
+                callback(error);
+            }
+        });
 }
 
 function writeError(err, res) {
