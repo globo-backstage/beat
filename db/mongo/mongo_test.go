@@ -2,14 +2,15 @@ package mongo
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+	"testing"
+
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/schemas"
 	simplejson "github.com/bitly/go-simplejson"
 	"gopkg.in/check.v1"
 	"gopkg.in/mgo.v2/bson"
-	"net/http"
-	"os"
-	"testing"
 )
 
 var _ = check.Suite(&S{})
@@ -137,17 +138,17 @@ func (s *S) TestFindItemSchemaByCollectionNameWithNotFound(c *check.C) {
 	c.Assert(dbErr.StatusCode(), check.Equals, http.StatusNotFound)
 }
 
-func (s *S) TestDeleteItemSchemaByCollectionNameWithNotFound(c *check.C) {
-	dbErr := s.Db.DeleteItemSchemaByCollectionName("not-found")
+func (s *S) TestDeleteItemSchemaWithNotFound(c *check.C) {
+	dbErr := s.Db.DeleteItemSchema("not-found")
 	c.Assert(dbErr, check.NotNil)
 	c.Assert(dbErr.StatusCode(), check.Equals, http.StatusNotFound)
 }
 
-func (s *S) TestDeleteItemSchemaByCollectionName(c *check.C) {
+func (s *S) TestDeleteItemSchema(c *check.C) {
 	dbErr := s.Db.CreateItemSchema(&schemas.ItemSchema{CollectionName: "to-be-deleted"})
 	c.Assert(dbErr, check.IsNil)
 
-	dbErr = s.Db.DeleteItemSchemaByCollectionName("to-be-deleted")
+	dbErr = s.Db.DeleteItemSchema("to-be-deleted")
 	c.Assert(dbErr, check.IsNil)
 
 	_, dbErr = s.Db.FindItemSchemaByCollectionName("to-be-deleted")

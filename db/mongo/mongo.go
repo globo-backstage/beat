@@ -1,6 +1,8 @@
 package mongo
 
 import (
+	"net/http"
+
 	_ "github.com/backstage/beat/config"
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
@@ -9,7 +11,6 @@ import (
 	"github.com/spf13/viper"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"net/http"
 )
 
 func init() {
@@ -111,7 +112,7 @@ func (m *MongoDB) FindItemSchemaByCollectionName(collectionName string) (*schema
 	return itemSchema, nil
 }
 
-func (m *MongoDB) DeleteItemSchemaByCollectionName(collectionName string) errors.Error {
+func (m *MongoDB) DeleteItemSchema(collectionName string) errors.Error {
 	session := m.session.Clone()
 	defer session.Close()
 

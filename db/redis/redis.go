@@ -3,13 +3,14 @@ package redis
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
 	"github.com/garyburd/redigo/redis"
 	"github.com/spf13/viper"
-	"net/http"
-	"time"
 )
 
 var (
@@ -94,7 +95,7 @@ func (r *Redis) FindItemSchemaByCollectionName(collectionName string) (*schemas.
 	return itemSchema, nil
 }
 
-func (r *Redis) DeleteItemSchemaByCollectionName(collectionName string) errors.Error {
+func (r *Redis) DeleteItemSchema(collectionName string) errors.Error {
 	err := r.deleteResource(schemas.ItemSchemaCollectionName, collectionName)
 	if err == redis.ErrNil {
 		return db.ItemSchemaNotFound

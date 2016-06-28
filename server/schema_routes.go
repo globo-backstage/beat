@@ -74,8 +74,7 @@ func (s *Server) findOneItemSchema(t *transaction.Transaction) {
 }
 
 func (s *Server) deleteItemSchema(t *transaction.Transaction) {
-	collectionName := t.Params["collectionName"]
-	err := s.DB.DeleteItemSchemaByCollectionName(collectionName)
+	err := s.DB.DeleteItemSchema(t.CollectionName)
 	if err != nil {
 		t.WriteError(err)
 		return

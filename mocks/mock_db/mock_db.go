@@ -41,14 +41,14 @@ func (_mr *_MockDatabaseRecorder) CreateItemSchema(arg0 interface{}) *gomock.Cal
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "CreateItemSchema", arg0)
 }
 
-func (_m *MockDatabase) DeleteItemSchemaByCollectionName(_param0 string) errors.Error {
-	ret := _m.ctrl.Call(_m, "DeleteItemSchemaByCollectionName", _param0)
+func (_m *MockDatabase) DeleteItemSchema(_param0 string) errors.Error {
+	ret := _m.ctrl.Call(_m, "DeleteItemSchema", _param0)
 	ret0, _ := ret[0].(errors.Error)
 	return ret0
 }
 
-func (_mr *_MockDatabaseRecorder) DeleteItemSchemaByCollectionName(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "DeleteItemSchemaByCollectionName", arg0)
+func (_mr *_MockDatabaseRecorder) DeleteItemSchema(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "DeleteItemSchema", arg0)
 }
 
 func (_m *MockDatabase) FindItemSchema(_param0 *db.Filter) (*db.ItemSchemasReply, errors.Error) {

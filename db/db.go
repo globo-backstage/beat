@@ -2,10 +2,11 @@ package db
 
 import (
 	"fmt"
-	"github.com/backstage/beat/errors"
-	"github.com/backstage/beat/schemas"
 	"net/http"
 	"strings"
+
+	"github.com/backstage/beat/errors"
+	"github.com/backstage/beat/schemas"
 )
 
 var (
@@ -21,7 +22,7 @@ type Database interface {
 	FindItemSchema(*Filter) (*ItemSchemasReply, errors.Error)
 	FindOneItemSchema(*Filter) (*schemas.ItemSchema, errors.Error)
 	FindItemSchemaByCollectionName(string) (*schemas.ItemSchema, errors.Error)
-	DeleteItemSchemaByCollectionName(string) errors.Error
+	DeleteItemSchema(string) errors.Error
 }
 
 type ItemSchemasReply struct {

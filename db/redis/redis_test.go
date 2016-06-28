@@ -1,11 +1,12 @@
 package redis
 
 import (
+	"net/http"
+	"testing"
+
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/schemas"
 	"gopkg.in/check.v1"
-	"net/http"
-	"testing"
 )
 
 var _ = check.Suite(&S{})
@@ -60,7 +61,7 @@ func (s *S) TestFindItemSchemaByCollectionNameWithNotFound(c *check.C) {
 }
 
 func (s *S) TestDeleteItemSchemaByCollectionNameWithNotFound(c *check.C) {
-	dbErr := s.Db.DeleteItemSchemaByCollectionName("not-found")
+	dbErr := s.Db.DeleteItemSchema("not-found")
 	c.Assert(dbErr, check.NotNil)
 	c.Assert(dbErr.StatusCode(), check.Equals, http.StatusNotFound)
 }
@@ -69,7 +70,7 @@ func (s *S) TestDeleteItemSchemaByCollectionName(c *check.C) {
 	dbErr := s.Db.CreateItemSchema(&schemas.ItemSchema{CollectionName: "to-be-deleted"})
 	c.Assert(dbErr, check.IsNil)
 
-	dbErr = s.Db.DeleteItemSchemaByCollectionName("to-be-deleted")
+	dbErr = s.Db.DeleteItemSchema("to-be-deleted")
 	c.Assert(dbErr, check.IsNil)
 
 	_, dbErr = s.Db.FindItemSchemaByCollectionName("to-be-deleted")
