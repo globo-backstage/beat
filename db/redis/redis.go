@@ -4,13 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
-	"github.com/garyburd/redigo/redis"
 	"github.com/spf13/viper"
+	"gopkg.in/redis.v4"
 )
 
 var (
@@ -19,19 +18,12 @@ var (
 )
 
 type Redis struct {
-	host     string
-	password string
-	db       int
-	pool     *redis.Pool
+	*redis.Client
 }
 
 func init() {
 	viper.SetDefault("redis.host", "localhost:6379")
 	viper.SetDefault("redis.db", 0)
-	viper.SetDefault("redis.pool.maxIdle", 10)
-	viper.SetDefault("redis.pool.maxActive", 10)
-	viper.SetDefault("redis.pool.wait", true)
-	viper.SetDefault("redis.pool.idleTimeout", 180e9)
 
 	db.Register("redis", func() (db.Database, error) {
 		return New()
@@ -39,37 +31,12 @@ func init() {
 }
 
 func New() (*Redis, error) {
-	d := &Redis{}
-	d.host = viper.GetString("redis.host")
-	d.password = viper.GetString("redis.password")
-	d.db = viper.GetInt("redis.db")
-
-	d.pool = &redis.Pool{
-		Dial: func() (redis.Conn, error) {
-			conn, err := redis.Dial("tcp", d.host)
-			if err != nil {
-				return nil, err
-			}
-			if d.password != "" {
-				_, err = conn.Do("AUTH", d.password)
-				if err != nil {
-					return nil, err
-				}
-			}
-			_, err = conn.Do("SELECT", d.db)
-			if err != nil {
-				return nil, err
-			}
-
-			return conn, nil
-		},
-		MaxIdle:     viper.GetInt("redis.pool.maxIdle"),
-		MaxActive:   viper.GetInt("redis.pool.maxActive"),
-		Wait:        viper.GetBool("redis.pool.wait"),
-		IdleTimeout: time.Duration(viper.GetInt("redis.pool.idleTimeout")),
-	}
-
-	return d, nil
+	client := redis.NewClient(&redis.Options{
+		Addr:     viper.GetString("redis.host"),
+		Password: viper.GetString("redis.password"),
+		DB:       viper.GetInt("redis.db"),
+	})
+	return &Redis{client}, nil
 }
 
 func (r *Redis) CreateItemSchema(itemSchema *schemas.ItemSchema) errors.Error {
@@ -87,7 +54,7 @@ func (r *Redis) FindOneItemSchema(*db.Filter) (*schemas.ItemSchema, errors.Error
 func (r *Redis) FindItemSchemaByCollectionName(collectionName string) (*schemas.ItemSchema, errors.Error) {
 	itemSchema := &schemas.ItemSchema{}
 	err := r.getResource(schemas.ItemSchemaCollectionName, collectionName, itemSchema)
-	if err == redis.ErrNil {
+	if err == redis.Nil {
 		return nil, db.ItemSchemaNotFound
 	} else if err != nil {
 		return nil, errors.Wraps(err, http.StatusInternalServerError)
@@ -97,7 +64,7 @@ func (r *Redis) FindItemSchemaByCollectionName(collectionName string) (*schemas.
 
 func (r *Redis) DeleteItemSchema(collectionName string) errors.Error {
 	err := r.deleteResource(schemas.ItemSchemaCollectionName, collectionName)
-	if err == redis.ErrNil {
+	if err == redis.Nil {
 		return db.ItemSchemaNotFound
 	} else if err != nil {
 		return errors.Wraps(err, http.StatusInternalServerError)
@@ -106,23 +73,14 @@ func (r *Redis) DeleteItemSchema(collectionName string) errors.Error {
 	return nil
 }
 
-func (r *Redis) Flush() {
-	redisConn := r.pool.Get()
-	redisConn.Do("flushdb")
-	redisConn.Close()
-}
-
 func (r *Redis) createResource(collectionName string, primaryKey string, result interface{}) errors.Error {
 	buf, err := json.Marshal(result)
 	if err != nil {
 		return errors.Wraps(err, http.StatusBadRequest)
 	}
-	redisKey := r.key(collectionName, primaryKey)
-	redisConn := r.pool.Get()
-	_, err = redis.String(redisConn.Do("SET", redisKey, string(buf), "NX"))
-	redisConn.Close()
+	created, err := r.SetNX(r.key(collectionName, primaryKey), string(buf), 0).Result()
 
-	if err == redis.ErrNil {
+	if err == redis.Nil || !created {
 		validationError := &errors.ValidationError{}
 		validationError.Put("_all", "Duplicated resource")
 		return validationError
@@ -134,30 +92,24 @@ func (r *Redis) createResource(collectionName string, primaryKey string, result 
 }
 
 func (r *Redis) getResource(collectionName string, primaryKey string, result interface{}) error {
-	redisKey := r.key(collectionName, primaryKey)
-	redisConn := r.pool.Get()
-	reply, err := redis.String(redisConn.Do("GET", redisKey))
-	redisConn.Close()
+	reply, err := r.Get(r.key(collectionName, primaryKey)).Bytes()
 
 	if err != nil {
 		return err
 	}
 
-	return json.Unmarshal([]byte(reply), result)
+	return json.Unmarshal(reply, result)
 }
 
 func (r *Redis) deleteResource(collectionName string, primaryKey string) error {
-	redisKey := r.key(collectionName, primaryKey)
-	redisConn := r.pool.Get()
-	reply, err := redis.Int(redisConn.Do("DEL", redisKey))
-	redisConn.Close()
+	reply, err := r.Del(r.key(collectionName, primaryKey)).Result()
 
 	if err != nil {
 		return err
 	}
 
 	if reply == 0 {
-		return redis.ErrNil
+		return redis.Nil
 	}
 
 	return nil

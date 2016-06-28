@@ -2,6 +2,7 @@ package redis
 
 import (
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/backstage/beat/db"
@@ -22,8 +23,9 @@ func Test(t *testing.T) {
 func (s *S) SetUpSuite(c *check.C) {
 	var err error
 
+	os.Setenv("REDIS_DB", "1")
 	s.Db, err = New()
-	s.Db.Flush()
+	s.Db.FlushDb()
 	c.Assert(err, check.IsNil)
 }
 
