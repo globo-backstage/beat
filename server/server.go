@@ -71,12 +71,13 @@ func (s *Server) initRoutes() {
 	s.GET("/healthcheck", s.healthCheck)
 
 	s.POST("/api/item-schemas", transaction.Handle(s.createItemSchema))
-	s.GET("/api/item-schemas", transaction.Handle(s.findItemSchema))
+	s.GET("/api/item-schemas", transaction.Handle(s.listItemSchemas))
 	s.GET("/api/item-schemas/findOne", transaction.Handle(s.findOneItemSchema))
-	s.GET("/api/item-schemas/:collectionName", transaction.Handle(s.findItemSchemaByCollectionName))
-	s.DELETE("/api/item-schemas/:collectionName", transaction.Handle(s.deleteItemSchemaByCollectionName))
+	s.GET("/api/item-schemas/:collectionName", s.collectionHandle(s.findItemSchema))
+	s.PUT("/api/item-schemas/:collectionName", s.collectionHandle(s.updateItemSchema))
+	s.DELETE("/api/item-schemas/:collectionName", s.collectionHandle(s.deleteItemSchema))
 
-	s.GET("/api/collection-schemas/:collectionName", transaction.Handle(s.findCollectionSchemaByCollectionName))
+	s.GET("/api/collection-schemas/:collectionName", s.collectionHandle(s.findCollectionSchema))
 
 	s.POST("/api/:collectionName", s.collectionHandle(s.createResource))
 	s.GET("/api/:collectionName", s.collectionHandle(s.findResource))
@@ -87,4 +88,18 @@ func (s *Server) initRoutes() {
 
 func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	fmt.Fprintf(w, "WORKING")
+}
+
+func (s *Server) collectionHandle(handler transaction.TransactionHandler) httptreemux.HandlerFunc {
+	return transaction.CollectionHandle(func(t *transaction.Transaction) {
+		itemSchema, err := s.DB.FindItemSchemaByCollectionName(t.CollectionName)
+
+		if err != nil {
+			t.WriteError(err)
+			return
+		}
+
+		t.ItemSchema = itemSchema
+		handler(t)
+	})
 }
