@@ -83,3 +83,13 @@ func (_m *MockDatabase) FindOneItemSchema(_param0 *db.Filter) (*schemas.ItemSche
 func (_mr *_MockDatabaseRecorder) FindOneItemSchema(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "FindOneItemSchema", arg0)
 }
+
+func (_m *MockDatabase) UpdateItemSchema(_param0 *schemas.ItemSchema) errors.Error {
+	ret := _m.ctrl.Call(_m, "UpdateItemSchema", _param0)
+	ret0, _ := ret[0].(errors.Error)
+	return ret0
+}
+
+func (_mr *_MockDatabaseRecorder) UpdateItemSchema(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "UpdateItemSchema", arg0)
+}
