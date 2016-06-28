@@ -84,6 +84,22 @@ func (s *Server) deleteItemSchema(t *transaction.Transaction) {
 }
 
 func (s *Server) updateItemSchema(t *transaction.Transaction) {
+	err := t.ItemSchema.UpdateFromReader(t.Req.Body)
+
+	if err != nil {
+		t.WriteError(err)
+		return
+	}
+	t.ItemSchema.DiscardDefaultLinks()
+	err = s.DB.UpdateItemSchema(t.ItemSchema)
+
+	if err != nil {
+		t.WriteError(err)
+		return
+	}
+
+	t.ItemSchema.AttachDefaultLinks(t.BaseUrl())
+	t.WriteResult(t.ItemSchema)
 }
 
 func (s *Server) findCollectionSchema(t *transaction.Transaction) {

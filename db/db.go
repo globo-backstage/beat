@@ -22,6 +22,7 @@ type Database interface {
 	FindItemSchema(*Filter) (*ItemSchemasReply, errors.Error)
 	FindOneItemSchema(*Filter) (*schemas.ItemSchema, errors.Error)
 	FindItemSchemaByCollectionName(string) (*schemas.ItemSchema, errors.Error)
+	UpdateItemSchema(*schemas.ItemSchema) errors.Error
 	DeleteItemSchema(string) errors.Error
 }
 

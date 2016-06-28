@@ -61,6 +61,18 @@ func (m *MongoDB) CreateItemSchema(itemSchema *schemas.ItemSchema) errors.Error 
 	return nil
 }
 
+func (m *MongoDB) UpdateItemSchema(itemSchema *schemas.ItemSchema) errors.Error {
+	session := m.session.Clone()
+	defer session.Close()
+	err := session.DB("").C(schemas.ItemSchemaCollectionName).UpdateId(itemSchema.CollectionName, itemSchema)
+
+	if err != nil {
+		return convertMongoError(err)
+	}
+
+	return nil
+}
+
 func (m *MongoDB) FindItemSchema(filter *db.Filter) (*db.ItemSchemasReply, errors.Error) {
 	session := m.session.Clone()
 	defer session.Close()

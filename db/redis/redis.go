@@ -43,6 +43,10 @@ func (r *Redis) CreateItemSchema(itemSchema *schemas.ItemSchema) errors.Error {
 	return r.createResource(schemas.ItemSchemaCollectionName, itemSchema.CollectionName, itemSchema)
 }
 
+func (r *Redis) UpdateItemSchema(*schemas.ItemSchema) errors.Error {
+	return ErrNotImplemented
+}
+
 func (r *Redis) FindItemSchema(*db.Filter) (*db.ItemSchemasReply, errors.Error) {
 	return nil, ErrNotImplemented
 }

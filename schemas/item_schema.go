@@ -3,10 +3,11 @@ package schemas
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/backstage/beat/errors"
 	"io"
 	"net/http"
 	"regexp"
+
+	"github.com/backstage/beat/errors"
 )
 
 const ItemSchemaPrimaryKey = "collectionName"
@@ -48,6 +49,15 @@ func NewItemSchemaFromReader(r io.Reader) (*ItemSchema, errors.Error) {
 	}
 	itemSchema.fillDefaultValues()
 	return itemSchema, itemSchema.validate()
+}
+
+func (schema *ItemSchema) UpdateFromReader(r io.Reader) errors.Error {
+	err := json.NewDecoder(r).Decode(schema)
+	if err != nil {
+		return errors.Wraps(err, http.StatusBadRequest)
+	}
+
+	return schema.validate()
 }
 
 func (schema *ItemSchema) fillDefaultValues() {
