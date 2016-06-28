@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/backstage/beat/config"
@@ -25,7 +26,7 @@ func main() {
 
 	config.LoadLogSettings()
 
-	s, err := server.NewWithConfigurableSettings()
+	s, err := server.New()
 	if err != nil {
 		log.Fatal(err.Error())
 	}

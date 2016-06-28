@@ -2,19 +2,25 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/backstage/beat/auth"
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/transaction"
 	"github.com/dimfeld/httptreemux"
 	"github.com/spf13/viper"
-	"net/http"
 )
 
 type Server struct {
+	*httptreemux.TreeMux
 	Authentication auth.Authable
 	DB             db.Database
-	router         *httptreemux.TreeMux
+}
+
+type ServerOpts struct {
+	Authentication auth.Authable
+	DB             db.Database
 }
 
 func init() {
@@ -24,16 +30,7 @@ func init() {
 	viper.SetDefault("authentication", "static")
 }
 
-func New(authentication auth.Authable, db db.Database) *Server {
-	server := &Server{
-		Authentication: authentication,
-		DB:             db,
-	}
-	server.initRoutes()
-	return server
-}
-
-func NewWithConfigurableSettings() (*Server, error) {
+func New() (*Server, error) {
 	db, err := db.New(viper.GetString("database"))
 
 	if err != nil {
@@ -45,34 +42,47 @@ func NewWithConfigurableSettings() (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+	return NewWithOpts(&ServerOpts{
+		Authentication: auth,
+		DB:             db,
+	}), nil
 
-	return New(auth, db), nil
+}
+
+func NewWithOpts(opts *ServerOpts) *Server {
+	router := httptreemux.New()
+	server := &Server{
+		TreeMux:        router,
+		Authentication: opts.Authentication,
+		DB:             opts.DB,
+	}
+	server.initRoutes()
+	return server
 }
 
 func (s *Server) Run() {
 	bind := fmt.Sprintf("%s:%d", viper.GetString("host"), viper.GetInt("port"))
 	log.Infof("Backstage Beat is running on http://%s/", bind)
-	log.Fatal(http.ListenAndServe(bind, s.router))
+	log.Fatal(http.ListenAndServe(bind, s))
 }
 
 func (s *Server) initRoutes() {
-	s.router = httptreemux.New()
-	s.router.GET("/", s.healthCheck)
-	s.router.GET("/healthcheck", s.healthCheck)
+	s.GET("/", s.healthCheck)
+	s.GET("/healthcheck", s.healthCheck)
 
-	s.router.POST("/api/item-schemas", transaction.Handle(s.createItemSchema))
-	s.router.GET("/api/item-schemas", transaction.Handle(s.findItemSchema))
-	s.router.GET("/api/item-schemas/findOne", transaction.Handle(s.findOneItemSchema))
-	s.router.GET("/api/item-schemas/:collectionName", transaction.Handle(s.findItemSchemaByCollectionName))
-	s.router.DELETE("/api/item-schemas/:collectionName", transaction.Handle(s.deleteItemSchemaByCollectionName))
+	s.POST("/api/item-schemas", transaction.Handle(s.createItemSchema))
+	s.GET("/api/item-schemas", transaction.Handle(s.findItemSchema))
+	s.GET("/api/item-schemas/findOne", transaction.Handle(s.findOneItemSchema))
+	s.GET("/api/item-schemas/:collectionName", transaction.Handle(s.findItemSchemaByCollectionName))
+	s.DELETE("/api/item-schemas/:collectionName", transaction.Handle(s.deleteItemSchemaByCollectionName))
 
-	s.router.GET("/api/collection-schemas/:collectionName", transaction.Handle(s.findCollectionSchemaByCollectionName))
+	s.GET("/api/collection-schemas/:collectionName", transaction.Handle(s.findCollectionSchemaByCollectionName))
 
-	s.router.POST("/api/:collectionName", s.collectionHandle(s.createResource))
-	s.router.GET("/api/:collectionName", s.collectionHandle(s.findResource))
-	s.router.GET("/api/:collectionName/findOne", s.collectionHandle(s.findOneResource))
-	s.router.GET("/api/:collectionName/:resourceId", s.collectionHandle(s.findResourceById))
-	s.router.DELETE("/api/:collectionName/:resourceId", s.collectionHandle(s.deleteResourceById))
+	s.POST("/api/:collectionName", s.collectionHandle(s.createResource))
+	s.GET("/api/:collectionName", s.collectionHandle(s.findResource))
+	s.GET("/api/:collectionName/findOne", s.collectionHandle(s.findOneResource))
+	s.GET("/api/:collectionName/:resourceId", s.collectionHandle(s.findResourceById))
+	s.DELETE("/api/:collectionName/:resourceId", s.collectionHandle(s.deleteResourceById))
 }
 
 func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request, _ map[string]string) {

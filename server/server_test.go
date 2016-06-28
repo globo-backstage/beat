@@ -2,18 +2,19 @@ package server
 
 import (
 	"fmt"
-	"github.com/Sirupsen/logrus"
-	"github.com/backstage/beat/auth"
-	"github.com/backstage/beat/db"
-	"github.com/backstage/beat/mocks/mock_db"
-	"github.com/golang/mock/gomock"
-	"gopkg.in/check.v1"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/backstage/beat/auth"
+	"github.com/backstage/beat/db"
+	"github.com/backstage/beat/mocks/mock_db"
+	"github.com/golang/mock/gomock"
+	"gopkg.in/check.v1"
 
 	_ "github.com/backstage/beat/auth/static"
 	_ "github.com/backstage/beat/db/mongo"
@@ -35,23 +36,23 @@ func (s *S) SetUpSuite(c *check.C) {
 }
 
 func (s *S) SetUpTest(c *check.C) {
-	s.server = New(nil, nil)
+	s.server = NewWithOpts(&ServerOpts{})
 }
 
-func (s *S) TestNewWithConfigurableSettingsWithInvalidDatabase(c *check.C) {
+func (s *S) TestNewWithInvalidDatabase(c *check.C) {
 	os.Setenv("DATABASE", "not-found")
 	os.Setenv("AUTHENTICATION", "static")
 
-	server, err := NewWithConfigurableSettings()
+	server, err := New()
 	c.Assert(server, check.IsNil)
 	c.Assert(err, check.FitsTypeOf, db.ErrNotFound{})
 }
 
-func (s *S) TestNewWithConfigurableSettingsWithInvalidAuthentication(c *check.C) {
+func (s *S) TestNewWithInvalidAuthentication(c *check.C) {
 	os.Setenv("DATABASE", "mongo")
 	os.Setenv("AUTHENTICATION", "not-found")
 
-	server, err := NewWithConfigurableSettings()
+	server, err := New()
 	c.Assert(server, check.IsNil)
 	c.Assert(err, check.FitsTypeOf, auth.ErrNotFound{})
 }
@@ -78,14 +79,14 @@ func (s *S) SimpleRequest(method, path string) *httptest.ResponseRecorder {
 
 func (s *S) Request(r *http.Request) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
-	s.server.router.ServeHTTP(w, r)
+	s.server.ServeHTTP(w, r)
 	return w
 }
 
 func (s *S) mockDatabase(c *check.C) *gomock.Controller {
 	mockCtrl := gomock.NewController(c)
 	s.db = mock_db.NewMockDatabase(mockCtrl)
-	s.server = New(nil, s.db)
+	s.server = NewWithOpts(&ServerOpts{DB: s.db})
 
 	return mockCtrl
 }
