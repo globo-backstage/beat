@@ -3,10 +3,11 @@ package errors
 import (
 	"encoding/json"
 	originalErrors "errors"
-	simplejson "github.com/bitly/go-simplejson"
-	"gopkg.in/check.v1"
 	"net/http"
 	"testing"
+
+	simplejson "github.com/bitly/go-simplejson"
+	"gopkg.in/check.v1"
 )
 
 var _ = check.Suite(&S{})
@@ -44,10 +45,10 @@ func (s *S) TestMarshallJSONWrappedError(c *check.C) {
 	data, err1 := json.Marshal(errWrapped)
 	c.Assert(err1, check.IsNil)
 
-	errJson, err2 := simplejson.NewJson(data)
+	errJSON, err2 := simplejson.NewJson(data)
 	c.Assert(err2, check.IsNil)
 
-	msg, err3 := errJson.Get("errors").GetIndex(0).Get("_all").GetIndex(0).String()
+	msg, err3 := errJSON.Get("errors").GetIndex(0).Get("_all").GetIndex(0).String()
 	c.Assert(err3, check.IsNil)
 	c.Assert(msg, check.Equals, "test error 123")
 }
@@ -70,10 +71,10 @@ func (s *S) TestValidationErrorMarshallJSON(c *check.C) {
 	data, err1 := json.Marshal(err)
 	c.Assert(err1, check.IsNil)
 
-	errJson, err2 := simplejson.NewJson(data)
+	errJSON, err2 := simplejson.NewJson(data)
 	c.Assert(err2, check.IsNil)
 
-	msg, err3 := errJson.Get("errors").GetIndex(0).Get("name").GetIndex(0).String()
+	msg, err3 := errJSON.Get("errors").GetIndex(0).Get("name").GetIndex(0).String()
 	c.Assert(err3, check.IsNil)
 	c.Assert(msg, check.Equals, "is required")
 }

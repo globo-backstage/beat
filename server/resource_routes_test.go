@@ -2,11 +2,12 @@ package server
 
 import (
 	"bytes"
+	"net/http"
+
 	"github.com/backstage/beat/db"
 	"github.com/backstage/beat/schemas"
 	simplejson "github.com/bitly/go-simplejson"
 	"gopkg.in/check.v1"
-	"net/http"
 )
 
 func (s *S) TestCreateResourceWithNotSupportedRoot(c *check.C) {
@@ -98,7 +99,7 @@ func (s *S) TestCreateResourceWhenItemSchemaNotIsFound(c *check.C) {
 	mockCtrl := s.mockDatabase(c)
 	defer mockCtrl.Finish()
 
-	s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(nil, db.ItemSchemaNotFound)
+	s.db.EXPECT().FindItemSchemaByCollectionName("photos").Return(nil, db.ErrItemSchemaNotFound)
 
 	buf := bytes.NewBufferString(`{"name": "ok"}`)
 	r, _ := http.NewRequest("POST", "/api/photos", buf)

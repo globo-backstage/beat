@@ -59,7 +59,7 @@ func (r *Redis) FindItemSchemaByCollectionName(collectionName string) (*schemas.
 	itemSchema := &schemas.ItemSchema{}
 	err := r.getResource(schemas.ItemSchemaCollectionName, collectionName, itemSchema)
 	if err == redis.Nil {
-		return nil, db.ItemSchemaNotFound
+		return nil, db.ErrItemSchemaNotFound
 	} else if err != nil {
 		return nil, errors.Wraps(err, http.StatusInternalServerError)
 	}
@@ -69,7 +69,7 @@ func (r *Redis) FindItemSchemaByCollectionName(collectionName string) (*schemas.
 func (r *Redis) DeleteItemSchema(collectionName string) errors.Error {
 	err := r.deleteResource(schemas.ItemSchemaCollectionName, collectionName)
 	if err == redis.Nil {
-		return db.ItemSchemaNotFound
+		return db.ErrItemSchemaNotFound
 	} else if err != nil {
 		return errors.Wraps(err, http.StatusInternalServerError)
 	}

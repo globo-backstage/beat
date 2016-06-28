@@ -82,8 +82,8 @@ func (s *Server) initRoutes() {
 	s.POST("/api/:collectionName", s.collectionHandle(s.createResource))
 	s.GET("/api/:collectionName", s.collectionHandle(s.findResource))
 	s.GET("/api/:collectionName/findOne", s.collectionHandle(s.findOneResource))
-	s.GET("/api/:collectionName/:resourceId", s.collectionHandle(s.findResourceById))
-	s.DELETE("/api/:collectionName/:resourceId", s.collectionHandle(s.deleteResourceById))
+	s.GET("/api/:collectionName/:resourceId", s.collectionHandle(s.findResourceByID))
+	s.DELETE("/api/:collectionName/:resourceId", s.collectionHandle(s.deleteResourceByID))
 }
 
 func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request, _ map[string]string) {

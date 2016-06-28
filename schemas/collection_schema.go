@@ -31,38 +31,38 @@ func NewCollectionSchema(itemSchema *ItemSchema) *CollectionSchema {
 	return collectionSchema
 }
 
-func (schema *CollectionSchema) ApplyBaseUrl(baseUrl string) {
-	schema.Properties.ref = baseUrl + schema.Properties.ref
-	schema.Links.ApplyBaseUrl(baseUrl)
+func (schema *CollectionSchema) ApplyBaseURL(baseURL string) {
+	schema.Properties.ref = baseURL + schema.Properties.ref
+	schema.Links.ApplyBaseURL(baseURL)
 }
 
 func (schema *CollectionSchema) defaultLinks(itemSchema *ItemSchema) *Links {
-	collectionUrl := itemSchema.collectionUrl()
-	itemSchemaUrl := itemSchema.url()
+	collectionURL := itemSchema.collectionURL()
+	itemSchemaURL := itemSchema.url()
 
 	return &Links{
-		&Link{Rel: "self", Href: collectionUrl},
-		&Link{Rel: "list", Href: collectionUrl},
-		&Link{Rel: "add", Method: "POST", Href: collectionUrl,
+		&Link{Rel: "self", Href: collectionURL},
+		&Link{Rel: "list", Href: collectionURL},
+		&Link{Rel: "add", Method: "POST", Href: collectionURL,
 			Schema: map[string]interface{}{
-				"$ref": itemSchemaUrl,
+				"$ref": itemSchemaURL,
 			},
 		},
 		&Link{
 			Rel:  "previous",
-			Href: fmt.Sprintf("%s?filter[perPage]={perPage}&filter[page]={previousPage}{&paginateQs*}", collectionUrl),
+			Href: fmt.Sprintf("%s?filter[perPage]={perPage}&filter[page]={previousPage}{&paginateQs*}", collectionURL),
 		},
 		&Link{
 			Rel:  "next",
-			Href: fmt.Sprintf("%s?filter[perPage]={perPage}&filter[page]={nextPage}{&paginateQs*}", collectionUrl),
+			Href: fmt.Sprintf("%s?filter[perPage]={perPage}&filter[page]={nextPage}{&paginateQs*}", collectionURL),
 		},
 		&Link{
 			Rel:  "page",
-			Href: fmt.Sprintf("%s?filter[perPage]={perPage}&filter[page]={page}{&paginateQs*}", collectionUrl),
+			Href: fmt.Sprintf("%s?filter[perPage]={perPage}&filter[page]={page}{&paginateQs*}", collectionURL),
 		},
 		&Link{
 			Rel:  "order",
-			Href: fmt.Sprintf("%s?filter[order]={orderAttribute}%s{orderDirection}{&orderQs*}", collectionUrl, "%20"),
+			Href: fmt.Sprintf("%s?filter[order]={orderAttribute}%s{orderDirection}{&orderQs*}", collectionURL, "%20"),
 		},
 	}
 }
@@ -75,7 +75,7 @@ func (c colProps) MarshalJSON() ([]byte, error) {
 	data := fmt.Sprintf(`{
     "items": {
       "items": {
-        "$ref": "%s"
+	"$ref": "%s"
       },
       "type": "array"
     },

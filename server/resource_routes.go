@@ -42,10 +42,10 @@ func (s *Server) findOneResource(t *transaction.Transaction) {
 	t.WriteError(errors.New("TODO: findOne resource", http.StatusNotImplemented))
 }
 
-func (s *Server) findResourceById(t *transaction.Transaction) {
+func (s *Server) findResourceByID(t *transaction.Transaction) {
 	t.WriteError(errors.New("TODO: find resource by id", http.StatusNotImplemented))
 }
 
-func (s *Server) deleteResourceById(t *transaction.Transaction) {
+func (s *Server) deleteResourceByID(t *transaction.Transaction) {
 	t.WriteError(errors.New("TODO: delete resource by id", http.StatusNotImplemented))
 }

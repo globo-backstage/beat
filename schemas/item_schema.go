@@ -16,8 +16,8 @@ const draft3Schema = "http://json-schema.org/draft-03/hyper-schema#"
 const draft4Schema = "http://json-schema.org/draft-04/hyper-schema#"
 const defaultSchema = draft4Schema
 
-var CollectionNameRegex *regexp.Regexp = regexp.MustCompile(`^[a-z0-9-]+$`)
-var CollectionNameSpaceRegex *regexp.Regexp = regexp.MustCompile(`^(\w+)-(.*)$`)
+var CollectionNameRegex = regexp.MustCompile(`^[a-z0-9-]+$`)
+var CollectionNameSpaceRegex = regexp.MustCompile(`^(\w+)-(.*)$`)
 
 type Properties map[string]map[string]interface{}
 
@@ -74,14 +74,14 @@ func (schema *ItemSchema) String() string {
 	return fmt.Sprintf(`<ItemSchema "%s">`, schema.CollectionName)
 }
 
-func (schema *ItemSchema) AttachDefaultLinks(baseUrl string) {
+func (schema *ItemSchema) AttachDefaultLinks(baseURL string) {
 	customLinks := schema.Links
 	schema.Links = schema.defaultLinks()
 
 	if customLinks != nil {
 		schema.Links = schema.Links.ConcatenateLinks(customLinks)
 	}
-	schema.Links.ApplyBaseUrl(baseUrl)
+	schema.Links.ApplyBaseURL(baseURL)
 }
 
 func (schema *ItemSchema) DiscardDefaultLinks() {
@@ -116,7 +116,7 @@ func (schema *ItemSchema) validate() errors.Error {
 	return nil
 }
 
-func (schema *ItemSchema) collectionUrl() string {
+func (schema *ItemSchema) collectionURL() string {
 	return fmt.Sprintf("/%s", schema.CollectionName)
 }
 
@@ -125,20 +125,20 @@ func (schema *ItemSchema) url() string {
 }
 
 func (schema *ItemSchema) defaultLinks() *Links {
-	collectionUrl := schema.collectionUrl()
-	schemaUrl := schema.url()
-	itemUrl := fmt.Sprintf("/%s/{id}", schema.CollectionName)
+	collectionURL := schema.collectionURL()
+	schemaURL := schema.url()
+	itemURL := fmt.Sprintf("/%s/{id}", schema.CollectionName)
 
 	return &Links{
-		&Link{Rel: "self", Href: itemUrl},
-		&Link{Rel: "item", Href: itemUrl},
-		&Link{Rel: "create", Method: "POST", Href: collectionUrl,
+		&Link{Rel: "self", Href: itemURL},
+		&Link{Rel: "item", Href: itemURL},
+		&Link{Rel: "create", Method: "POST", Href: collectionURL,
 			Schema: map[string]interface{}{
-				"$ref": schemaUrl,
+				"$ref": schemaURL,
 			},
 		},
-		&Link{Rel: "update", Method: "PUT", Href: itemUrl},
-		&Link{Rel: "delete", Method: "DELETE", Href: itemUrl},
-		&Link{Rel: "parent", Href: collectionUrl},
+		&Link{Rel: "update", Method: "PUT", Href: itemURL},
+		&Link{Rel: "delete", Method: "DELETE", Href: itemURL},
+		&Link{Rel: "parent", Href: collectionURL},
 	}
 }

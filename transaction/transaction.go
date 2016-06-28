@@ -4,13 +4,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"time"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/backstage/beat/errors"
 	"github.com/backstage/beat/schemas"
 	"github.com/dimfeld/httptreemux"
 	"github.com/satori/go.uuid"
-	"net/http"
-	"time"
 )
 
 const (
@@ -23,7 +24,7 @@ type TransactionHandler func(*Transaction)
 type Transaction struct {
 	writer         http.ResponseWriter
 	statusCode     int
-	Id             string
+	ID             string
 	CollectionName string
 	ItemSchema     *schemas.ItemSchema
 	Params         map[string]string
@@ -52,7 +53,7 @@ func (t *Transaction) NoResultWithStatusCode(statusCode int) {
 	t.writer.WriteHeader(statusCode)
 }
 
-func (t *Transaction) BaseUrl() string {
+func (t *Transaction) BaseURL() string {
 	host := t.Req.URL.Host
 	scheme := t.Req.URL.Scheme
 
@@ -69,10 +70,10 @@ func (t *Transaction) BaseUrl() string {
 func Handle(handler TransactionHandler) httptreemux.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request, ps map[string]string) {
 		start := time.Now()
-		id := IdFromRequest(r)
+		id := IDFromRequest(r)
 
 		t := &Transaction{
-			Id:     id,
+			ID:     id,
 			Req:    r,
 			writer: w,
 			Params: ps,
@@ -90,10 +91,10 @@ func CollectionHandle(handler TransactionHandler) httptreemux.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request, ps map[string]string) {
 		start := time.Now()
 		collectionName := ps["collectionName"]
-		id := IdFromRequest(r)
+		id := IDFromRequest(r)
 
 		t := &Transaction{
-			Id:             id,
+			ID:             id,
 			CollectionName: collectionName,
 			Req:            r,
 			writer:         w,
@@ -109,7 +110,7 @@ func CollectionHandle(handler TransactionHandler) httptreemux.HandlerFunc {
 	}
 }
 
-func IdFromRequest(r *http.Request) string {
+func IDFromRequest(r *http.Request) string {
 	header := r.Header.Get(TransactionHeader)
 	if header == "" || len(header) > MaxTransactionHeader {
 		header = base64.RawStdEncoding.EncodeToString(uuid.NewV4().Bytes())

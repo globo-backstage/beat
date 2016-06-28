@@ -1,8 +1,9 @@
 package schemas
 
 import (
-	"gopkg.in/check.v1"
 	"strings"
+
+	"gopkg.in/check.v1"
 )
 
 var _ = check.Suite(&CollectionSchemaSuite{})
@@ -15,12 +16,12 @@ func (s *CollectionSchemaSuite) SetUpTest(c *check.C) {
 	schema := `{
 		"$schema": "http://json-schema.org/draft-04/hyper-schema#",
 		"collectionName": "backstage-users",
-                "collectionTitle": "my collection Title",
+		"collectionTitle": "my collection Title",
 		"type": "object",
-                "collectionLinks": [
-                    {"rel": "top10", "href": "http://github.com/jedi"},
-                    {"rel": "history", "href": "/juniors"}
-                ]
+		"collectionLinks": [
+		    {"rel": "top10", "href": "http://github.com/jedi"},
+		    {"rel": "history", "href": "/juniors"}
+		]
 	}`
 	reader := strings.NewReader(schema)
 	itemSchema, err := NewItemSchemaFromReader(reader)
@@ -70,7 +71,7 @@ func (s *CollectionSchemaSuite) TestNewCollectionSchemaLinks(c *check.C) {
 }
 
 func (s *CollectionSchemaSuite) TestNewCollectionSchemaApplyBaseUrl(c *check.C) {
-	s.collectionSchema.ApplyBaseUrl("https://my-beat.com/api")
+	s.collectionSchema.ApplyBaseURL("https://my-beat.com/api")
 
 	c.Assert(s.collectionSchema.Properties.ref, check.Equals, "https://my-beat.com/api/item-schemas/backstage-users")
 

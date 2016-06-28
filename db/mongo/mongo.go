@@ -100,7 +100,7 @@ func (m *MongoDB) FindOneItemSchema(filter *db.Filter) (*schemas.ItemSchema, err
 	err := query.One(&itemSchema)
 
 	if err == mgo.ErrNotFound {
-		return nil, db.ItemSchemaNotFound
+		return nil, db.ErrItemSchemaNotFound
 	} else if err != nil {
 		return nil, errors.Wraps(err, http.StatusInternalServerError)
 	}
@@ -116,7 +116,7 @@ func (m *MongoDB) FindItemSchemaByCollectionName(collectionName string) (*schema
 	err := session.DB("").C(schemas.ItemSchemaCollectionName).FindId(collectionName).One(&itemSchema)
 
 	if err == mgo.ErrNotFound {
-		return nil, db.ItemSchemaNotFound
+		return nil, db.ErrItemSchemaNotFound
 	} else if err != nil {
 		return nil, errors.Wraps(err, http.StatusInternalServerError)
 	}
@@ -130,7 +130,7 @@ func (m *MongoDB) DeleteItemSchema(collectionName string) errors.Error {
 
 	err := session.DB("").C(schemas.ItemSchemaCollectionName).RemoveId(collectionName)
 	if err == mgo.ErrNotFound {
-		return db.ItemSchemaNotFound
+		return db.ErrItemSchemaNotFound
 	} else if err != nil {
 		return errors.Wraps(err, http.StatusInternalServerError)
 	}
@@ -159,7 +159,7 @@ func BuildMongoWhere(where *simplejson.Json, primaryKey string) bson.M {
 
 func buildMongoWhereByArray(wheres *simplejson.Json, primaryKey string) []bson.M {
 	mongoWheres := []bson.M{}
-	for key, _ := range wheres.MustArray() {
+	for key := range wheres.MustArray() {
 		mongoWhere := BuildMongoWhere(wheres.GetIndex(key), primaryKey)
 		mongoWheres = append(mongoWheres, mongoWhere)
 	}

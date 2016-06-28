@@ -1,14 +1,15 @@
 package transaction
 
 import (
-	"github.com/Sirupsen/logrus"
-	"github.com/backstage/beat/errors"
-	simplejson "github.com/bitly/go-simplejson"
-	"gopkg.in/check.v1"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/backstage/beat/errors"
+	simplejson "github.com/bitly/go-simplejson"
+	"gopkg.in/check.v1"
 )
 
 var _ = check.Suite(&S{})
@@ -48,7 +49,7 @@ func (s *S) TestHandle(c *check.C) {
 
 	handler(s.Writer, s.Req, map[string]string{"collectionName": "users"})
 
-	c.Assert(capturedTransaction.Id, check.HasLen, 22)
+	c.Assert(capturedTransaction.ID, check.HasLen, 22)
 	c.Assert(capturedTransaction.writer, check.Equals, s.Writer)
 	c.Assert(capturedTransaction.Req, check.Equals, s.Req)
 	c.Assert(capturedTransaction.Params, check.DeepEquals, map[string]string{"collectionName": "users"})
@@ -108,31 +109,31 @@ func (s *S) TestBaseUrl(c *check.C) {
 	c.Assert(err, check.IsNil)
 	s.T.Req = r
 
-	c.Assert(s.T.BaseUrl(), check.Equals, "http://my-host.com/api")
+	c.Assert(s.T.BaseURL(), check.Equals, "http://my-host.com/api")
 }
 
-func (s *S) TestIdFromRequestWithEmptyHeader(c *check.C) {
+func (s *S) TestIDFromRequestWithEmptyHeader(c *check.C) {
 	r, err := http.NewRequest("GET", "http://localhost", nil)
 	c.Assert(err, check.IsNil)
 
-	id := IdFromRequest(r)
+	id := IDFromRequest(r)
 	c.Assert(id, check.HasLen, 22)
 }
 
-func (s *S) TestIdFromRequestWithFilledHeader(c *check.C) {
+func (s *S) TestIDFromRequestWithFilledHeader(c *check.C) {
 	r, err := http.NewRequest("GET", "http://localhost", nil)
 	c.Assert(err, check.IsNil)
 
 	r.Header.Set("Backstage-Transaction", "BBBBBBBBBBBBBBBBBBBBBZ")
-	id := IdFromRequest(r)
+	id := IDFromRequest(r)
 	c.Assert(id, check.Equals, "BBBBBBBBBBBBBBBBBBBBBZ")
 }
 
-func (s *S) TestIdFromRequestWithBigHeader(c *check.C) {
+func (s *S) TestIDFromRequestWithBigHeader(c *check.C) {
 	r, err := http.NewRequest("GET", "http://localhost", nil)
 	c.Assert(err, check.IsNil)
 
 	r.Header.Set("Backstage-Transaction", "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
-	id := IdFromRequest(r)
+	id := IDFromRequest(r)
 	c.Assert(id, check.HasLen, 22)
 }

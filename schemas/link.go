@@ -22,18 +22,18 @@ var (
 
 type Links []*Link
 
-func (l Links) ApplyBaseUrl(baseUrl string) {
+func (l Links) ApplyBaseURL(baseURL string) {
 	for _, link := range l {
 		if isRelativeLink(link.Href) {
-			link.Href = fmt.Sprintf("%s%s", baseUrl, link.Href)
+			link.Href = fmt.Sprintf("%s%s", baseURL, link.Href)
 		}
 
 		if ref, ok := link.Schema["$ref"].(string); ok && isRelativeLink(ref) {
-			link.Schema["$ref"] = fmt.Sprintf("%s%s", baseUrl, ref)
+			link.Schema["$ref"] = fmt.Sprintf("%s%s", baseURL, ref)
 		}
 
 		if ref, ok := link.TargetSchema["$ref"].(string); ok && isRelativeLink(ref) {
-			link.TargetSchema["$ref"] = fmt.Sprintf("%s%s", baseUrl, ref)
+			link.TargetSchema["$ref"] = fmt.Sprintf("%s%s", baseURL, ref)
 		}
 	}
 }
@@ -71,10 +71,10 @@ func isRelativeLink(link string) bool {
 		return false
 	}
 
-	return url.Host == "" && url.Scheme == "" && !isUriTemplate(link)
+	return url.Host == "" && url.Scheme == "" && !isURITemplate(link)
 }
 
-func isUriTemplate(link string) bool {
+func isURITemplate(link string) bool {
 	return len(link) > 0 && link[0] == '{'
 }
 

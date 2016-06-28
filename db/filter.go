@@ -1,10 +1,11 @@
 package db
 
 import (
-	simplejson "github.com/bitly/go-simplejson"
 	"net/url"
 	"strconv"
 	"strings"
+
+	simplejson "github.com/bitly/go-simplejson"
 )
 
 type Filter struct {
@@ -24,7 +25,7 @@ func NewFilterFromQueryString(q string) (*Filter, error) {
 	}
 
 	for key, value := range urlValues {
-		filter.putUrlValue(key, value[0])
+		filter.putURLValue(key, value[0])
 	}
 
 	return filter, nil
@@ -39,7 +40,7 @@ func (filter *Filter) Skip() int {
 	return (filter.Page - 1) * filter.PerPage
 }
 
-func (filter *Filter) putUrlValue(key, value string) {
+func (filter *Filter) putURLValue(key, value string) {
 	path := []string{}
 
 	for _, part := range strings.Split(key, "[") {

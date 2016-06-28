@@ -24,7 +24,7 @@ func (s *Server) createItemSchema(t *transaction.Transaction) {
 		return
 	}
 
-	itemSchema.AttachDefaultLinks(t.BaseUrl())
+	itemSchema.AttachDefaultLinks(t.BaseURL())
 	t.WriteResultWithStatusCode(http.StatusCreated, itemSchema)
 }
 
@@ -42,16 +42,16 @@ func (s *Server) listItemSchemas(t *transaction.Transaction) {
 		return
 	}
 
-	baseUrl := t.BaseUrl()
+	baseURL := t.BaseURL()
 	for _, itemSchema := range reply.Items {
-		itemSchema.AttachDefaultLinks(baseUrl)
+		itemSchema.AttachDefaultLinks(baseURL)
 	}
 
 	t.WriteResult(reply)
 }
 
 func (s *Server) findItemSchema(t *transaction.Transaction) {
-	t.ItemSchema.AttachDefaultLinks(t.BaseUrl())
+	t.ItemSchema.AttachDefaultLinks(t.BaseURL())
 	t.WriteResult(t.ItemSchema)
 }
 
@@ -69,7 +69,7 @@ func (s *Server) findOneItemSchema(t *transaction.Transaction) {
 		return
 	}
 
-	itemSchema.AttachDefaultLinks(t.BaseUrl())
+	itemSchema.AttachDefaultLinks(t.BaseURL())
 	t.WriteResult(itemSchema)
 }
 
@@ -98,13 +98,13 @@ func (s *Server) updateItemSchema(t *transaction.Transaction) {
 		return
 	}
 
-	t.ItemSchema.AttachDefaultLinks(t.BaseUrl())
+	t.ItemSchema.AttachDefaultLinks(t.BaseURL())
 	t.WriteResult(t.ItemSchema)
 }
 
 func (s *Server) findCollectionSchema(t *transaction.Transaction) {
 	collectionSchema := schemas.NewCollectionSchema(t.ItemSchema)
-	collectionSchema.ApplyBaseUrl(t.BaseUrl())
+	collectionSchema.ApplyBaseURL(t.BaseURL())
 
 	t.WriteResult(collectionSchema)
 }

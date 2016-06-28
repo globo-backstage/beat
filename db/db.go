@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	ItemSchemaNotFound       = errors.New("item-schema not found", http.StatusNotFound)
-	CollectionSchemaNotFound = errors.New("collection-schema not found", http.StatusNotFound)
-	databases                = map[string]RegisterFunc{}
+	ErrItemSchemaNotFound       = errors.New("item-schema not found", http.StatusNotFound)
+	ErrCollectionSchemaNotFound = errors.New("collection-schema not found", http.StatusNotFound)
+	databases                   = map[string]RegisterFunc{}
 )
 
 type RegisterFunc func() (Database, error)
